@@ -7,8 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html 
  *
  * Contributors:
- * 	 kaberi Singh - Initial Contribution
- *   Hari hara prasad Viswanathan  - updations
+ * 	kaberi Singh - Initial Contribution
+ *	Hari hara prasad Viswanathan  - updations
+ * 	Nikhil Chennakeshava Murthy and Hari hara prasad Viswanatha - Client certificate based authentication
  */
  
 using System;
@@ -39,6 +40,12 @@ namespace IBMWIoTP
         private string clientPassword;
         private string clientId;
         private string orgId;
+        
+        private string caCertificatePath;
+        private string clientCertificatePath;
+        private string caCertificatePassword;
+        private string clientCertificatePassword;
+        
         private ILog log = log4net.LogManager.GetLogger(typeof(DeviceManagement));
         
         protected static readonly String CLIENT_ID_DELIMITER = ":";
@@ -57,6 +64,7 @@ namespace IBMWIoTP
         ///     object of String which denotes userName </param>
         /// <param name="password">
         ///     object of String which denotes password </param>
+               
         public AbstractClient(string orgid, string clientId, string userName, string password)
         {
             this.clientId = clientId;
@@ -76,7 +84,7 @@ namespace IBMWIoTP
 	            mqttClient = new MqttClient(hostName,MQTTS_PORT,true,cer,new X509Certificate(),MqttSslProtocols.TLSv1_2);
             
             } catch (Exception) {
-	            log.Info("hostname is :" + hostName+"  with insecure connection");
+            	log.Warn("hostname is :" + hostName+"  with insecure connection");
             	
             	mqttClient = new MqttClient(hostName);
             	//throw;
@@ -85,7 +93,91 @@ namespace IBMWIoTP
 
 
         }
+        
+                
+        /// <param name="orgid">
+        ///     object of String which denotes OrgId </param>
+        /// <param name="clientId">
+        ///     object of String which denotes clientId </param>
+        /// <param name="userName">
+        ///     object of String which denotes userName </param>
+        /// <param name="password">
+        ///     object of String which denotes password </param>
+        ///	<param name="caCertificatePath">
+        ///     object of String which denotes CA certificate path </param>
+        /// <param name="caCertificatePassword">
+        ///     object of String which denotes CA certificate password </param>
+        /// <param name="clientCertificatePath">
+        ///     object of String which denotes client certificate path </param>
+        /// <param name="clientCertificatePassword">
+        ///     object of String which denotes client certificate password </param>
+                
+        public AbstractClient(string orgid, string clientId, string userName, string password, string caCertificatePath, string caCertificatePassword, string clientCertificatePath, string clientCertificatePassword)
+        {
+        	
+        	
+            this.clientId = clientId;
+            this.clientUsername = userName;
+            this.clientPassword = password;
+            this.orgId = orgid;
+            
+            this.caCertificatePath = caCertificatePath;
+            this.caCertificatePassword = caCertificatePassword;
+            this.clientCertificatePath = clientCertificatePath;
+            this.clientCertificatePassword = clientCertificatePassword;
+            
+            String now = DateTime.Now.ToString(".yyyy.MM.dd-THH.mm.fff");
 
+            string hostName = orgid + DOMAIN;
+			if(String.IsNullOrEmpty(caCertificatePath) || String.IsNullOrEmpty(caCertificatePassword) || String.IsNullOrEmpty(clientCertificatePath) || String.IsNullOrEmpty(clientCertificatePassword)){ 		
+
+	            try {
+	            	X509Certificate cer = new X509Certificate();
+	            	if(File.Exists("message.pem")){
+						cer.Import("message.pem");
+	            	}
+		            log.Info("hostname is :" + hostName);
+		            mqttClient = new MqttClient(hostName,MQTTS_PORT,true,cer,new X509Certificate(),MqttSslProtocols.TLSv1_2);
+	            
+	            } catch (Exception) {
+	            	log.Warn("hostname is :" + hostName+"  with insecure connection");
+	            	
+	            	mqttClient = new MqttClient(hostName);
+	            	//throw;
+	            }
+			        		
+            }else{
+	            try {
+	            	X509Certificate2 caCert = new X509Certificate2(caCertificatePath, caCertificatePassword);
+					X509Certificate2 clientCert = new X509Certificate2(clientCertificatePath, clientCertificatePassword);
+	            	
+					try{
+						X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+						store.Open(OpenFlags.ReadWrite);
+						store.Add(caCert); 
+						store.Add(clientCert);
+						store.Close();
+					}
+					catch(Exception e){
+						log.Error("Unable to add certifiactes to the store");
+						throw(new Exception("Unable to add certifiactes to the store", e.InnerException));
+					}
+					
+	            	
+		            log.Info("hostname is :" + hostName);
+		            mqttClient = new MqttClient(hostName,MQTTS_PORT,true,caCert,clientCert,MqttSslProtocols.TLSv1_2);
+	            
+	            }catch (Exception e) {
+		            log.Info("hostname is :" + hostName+"  with insecure connection");
+		            log.Error("error in constructor, going towards insecure connection" + e.ToString());
+	            	throw;
+	            }
+            
+            }
+			
+        }
+        
+               
         /// <summary>
         ///     Connect the device from the IBM Watson IoT Platform
         /// </summary>

@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Hari hara prasad Viswanathan  - Initial Contribution
+ * 	 Nikhil Chennakeshava Murthy and Hari hara prasad Viswanatha - Client certificate based authentication
  */
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,12 @@ namespace IBMWIoTP
         static string _deviceID ="";
         static string _authmethod ="";
         static string _authtoken ="";
+        
+        static string _caCertificatePath = "";
+        static string _caCertificatePassword = "";
+        static string _clientCertificatePath = "";
+        static string _clientCertificatePassword = "";
+        
         /// <summary>
 		/// Constructor of Gateway Client, helps to connect a gateway to The Watson IoT Platform
         /// </summary>
@@ -58,6 +65,7 @@ namespace IBMWIoTP
         /// <param name="gatewayDeviceID">object of String which denotes gateway Id</param>
         /// <param name="authMethod">object of String which denotes your authentication method</param>
         /// <param name="authToken">object of String which denotes your authentication token</param>
+        
 		public GatewayClient(string orgId, string gatewayDeviceType, string gatewayDeviceID, string authMethod, string authToken)
             : base(orgId, "g" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + gatewayDeviceType + CLIENT_ID_DELIMITER + gatewayDeviceID, "use-token-auth", authToken)
 		{
@@ -65,12 +73,26 @@ namespace IBMWIoTP
 			this.gatewayDeviceType =gatewayDeviceType;
 			this.authtoken = authToken;
 		}
+		
+		
+		public GatewayClient(string orgId, string gatewayDeviceType, string gatewayDeviceID, string authMethod, string authToken, string caCertificatePath, string caCertificatePassword, string clientCertificatePath, string clientCertificatePassword)
+            : base(orgId, "g" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + gatewayDeviceType + CLIENT_ID_DELIMITER + gatewayDeviceID, "use-token-auth", authToken, caCertificatePath,  caCertificatePassword,  clientCertificatePath,  clientCertificatePassword)
+		{
+			this.gatewayDeviceID =gatewayDeviceID;
+			this.gatewayDeviceType =gatewayDeviceType;
+			this.authtoken = authToken;
+		}
+		
+		
+		
+		
+		
 		/// <summary>
 		/// Constructor of Gateway Client, helps to connect a gateway to The Watson IoT Platform
 		/// </summary>
 		/// <param name="filePath">object of String which denotes file path that contains gateway credentials in specified format</param>
 		public GatewayClient(string filePath)
-            : base(parseFromFile( filePath), "g" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID, "use-token-auth", _authtoken)
+            : base(parseFromFile( filePath), "g" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID, "use-token-auth", _authtoken, _caCertificatePath, _caCertificatePassword, _clientCertificatePath, _clientCertificatePassword)
 		{
 			this.gatewayDeviceID =_deviceID;
 			this.gatewayDeviceType =_deviceType;
@@ -86,6 +108,13 @@ namespace IBMWIoTP
         		!data.TryGetValue("Authentication-Token",out _authtoken) )
         	{
         		throw new Exception("Invalid property file");
+        	}
+        	if(	!data.TryGetValue("CA-Certificate-Path",out _caCertificatePath)||
+				!data.TryGetValue("CA-Certificate-Password",out _caCertificatePassword)||
+				!data.TryGetValue("Client-Certificate-Path",out _clientCertificatePath)||
+				!data.TryGetValue("Client-Certificate-Password",out _clientCertificatePassword))
+        	{
+        		//log.Info("Certificate's Not found in the given config file")
         	}
         	return _orgId;
         }
