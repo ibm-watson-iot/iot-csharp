@@ -1,0 +1,6 @@
+## Gateway Registration detail
+Organization-ID = <Your Organization ID>
+Device-Type = <Your Gateway Type>
+Device-ID = <Your Gateway ID>
+Authentication-Method = token
+Authentication-Token = <Your Gateway Token>

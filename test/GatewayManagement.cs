@@ -438,7 +438,7 @@ namespace test
 				testClient.setUpdateState(IBMWIoTP.DeviceManagement.UPDATESTATE_SUCCESS);
 				
 			};
-			string msgUpdate = "{\"reqId\":\"980c9013-6e91-4d9c-898b-a9c4709a4708\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\",\"value\":{\"version\":\"\",\"name\":\"\",\"uri\":\"https://test.com/file.dll\",\"verifier\":\"\",\"state\":0,\"updateStatus\":0,\"updatedDateTime\":\"\"}}],\"action\":\"firmware/update\"}}";
+			string msgUpdate = "{\"reqId\":\"980c9013-6e91-4d9c-898b-a9c4709a4708\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\",\"value\":{\"version\":\"\",\"name\":\"\",\"uri\":\"https://test.com/file.dll\",\"verifier\":\"\",\"state\":2,\"updateStatus\":0,\"updatedDateTime\":\"\"}}],\"action\":\"firmware/update\"}}";
 			MqttMsgPublishEventArgs evtUpdate = new MqttMsgPublishEventArgs("iotdm-1/type/"+deviceType+"/id/"+deviceID+"/device/update",System.Text.Encoding.UTF8.GetBytes(msgUpdate),false,1,true);
 			testClient.subscriptionHandler(new {},evtUpdate);
 			
@@ -459,5 +459,88 @@ namespace test
 			Assert.AreEqual(uri,"https://test.com/file.dll");
 			Assert.IsTrue(wasCalled);
 		}
+		
+		[Test]
+		public void GatewayActionFirmeare_connectedDevice_a_Download()
+		{
+			bool wasCalled = false;
+			string recivedAction="",reqId="";
+			string connectedDevice ="",connectedDeviceType ="";
+			string deviceType ="connectedDevice";
+			string deviceID = "conndectedId";
+			testClient.connectedDevicefwActionCallback += (string devicetype ,string deviceid,string action, IBMWIoTP.DeviceActionReq fw)=>{
+				wasCalled = true;
+				recivedAction = action;
+				reqId = fw.reqId;
+				connectedDeviceType = devicetype;
+				connectedDevice = deviceid;
+				//testClient.setState(IBMWIoTP.DeviceManagement.UPDATESTATE_DOWNLOADED);
+			};
+			string msgUpdate = "{\"reqId\":\"852536dd-db36-43c9-bed0-ba76124a1b90\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\",\"value\":{\"version\":\"\",\"name\":\"\",\"uri\":\"https://test.com/file.dll\",\"verifier\":\"\",\"state\":0,\"updateStatus\":0,\"updatedDateTime\":\"\"}}],\"action\":\"firmware/download\"}}";
+			MqttMsgPublishEventArgs evtUpdate = new MqttMsgPublishEventArgs("iotdm-1/type/"+deviceType+"/id/"+deviceID+"/device/update",System.Text.Encoding.UTF8.GetBytes(msgUpdate),false,1,true);
+			testClient.subscriptionHandler(new {},evtUpdate);
+			
+			string msgObserve = "{\"reqId\":\"852536dd-db36-43c9-bed0-ba76124a1b90\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\"}]}}";
+			MqttMsgPublishEventArgs evtObserve = new MqttMsgPublishEventArgs("iotdm-1/type/"+deviceType+"/id/"+deviceID+"/observe",System.Text.Encoding.UTF8.GetBytes(msgObserve),false,1,true);
+			testClient.subscriptionHandler(new {},evtObserve);
+			
+			
+			string msg = "{\"reqId\":\"852536dd-db36-43c9-bed0-ba76124a1b90\"}";
+			MqttMsgPublishEventArgs evt = new MqttMsgPublishEventArgs("iotdm-1/type/"+deviceType+"/id/"+deviceID+"/mgmt/initiate/firmware/download",System.Text.Encoding.UTF8.GetBytes(msg),false,1,true);
+			testClient.subscriptionHandler(new {},evt);
+			
+			string msgCancel = "{\"reqId\":\"852536dd-db36-43c9-bed0-ba76124a1b90\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\"}]}}";
+			MqttMsgPublishEventArgs evtCancel = new MqttMsgPublishEventArgs("iotdm-1/type/"+deviceType+"/id/"+deviceID+"/cancel",System.Text.Encoding.UTF8.GetBytes(msgCancel),false,1,true);
+			testClient.subscriptionHandler(new {},evtCancel);
+			
+			Assert.AreEqual(recivedAction,"download");
+			Assert.AreEqual(reqId,"852536dd-db36-43c9-bed0-ba76124a1b90");
+			
+			Assert.AreEqual(connectedDevice,deviceID);
+			Assert.AreEqual(connectedDeviceType,deviceType);
+			Assert.IsTrue(wasCalled);
+		}
+		
+		[Test]
+		public void GatewayActionFirmeare_connectedDevice_b_Update()
+		{
+			bool wasCalled = false;
+			string recivedAction="",reqId="";
+			string connectedDevice ="",connectedDeviceType ="";
+			string deviceType ="connectedDevice";
+			string deviceID = "conndectedId";
+			testClient.connectedDevicefwActionCallback += (string devicetype ,string deviceid,string action, IBMWIoTP.DeviceActionReq fw)=>{
+				wasCalled = true;
+				recivedAction = action;
+				reqId = fw.reqId;
+				connectedDeviceType = devicetype;
+				connectedDevice = deviceid;
+				testClient.setUpdateState(IBMWIoTP.DeviceManagement.UPDATESTATE_SUCCESS);
+				
+			};
+			string msgUpdate = "{\"reqId\":\"980c9013-6e91-4d9c-898b-a9c4709a4708\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\",\"value\":{\"version\":\"\",\"name\":\"\",\"uri\":\"https://test.com/file.dll\",\"verifier\":\"\",\"state\":2,\"updateStatus\":0,\"updatedDateTime\":\"\"}}],\"action\":\"firmware/update\"}}";
+			MqttMsgPublishEventArgs evtUpdate = new MqttMsgPublishEventArgs("iotdm-1/type/"+deviceType+"/id/"+deviceID+"/device/update",System.Text.Encoding.UTF8.GetBytes(msgUpdate),false,1,true);
+			testClient.subscriptionHandler(new {},evtUpdate);
+			
+			string msgObserve = "{\"reqId\":\"980c9013-6e91-4d9c-898b-a9c4709a4708\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\"}]}}";
+			MqttMsgPublishEventArgs evtObserve = new MqttMsgPublishEventArgs("iotdm-1/type/"+deviceType+"/id/"+deviceID+"/observe",System.Text.Encoding.UTF8.GetBytes(msgObserve),false,1,true);
+			testClient.subscriptionHandler(new {},evtObserve);
+			
+			
+			string msg = "{\"reqId\":\"980c9013-6e91-4d9c-898b-a9c4709a4708\"}";
+			MqttMsgPublishEventArgs evt = new MqttMsgPublishEventArgs("iotdm-1/type/"+deviceType+"/id/"+deviceID+"/mgmt/initiate/firmware/update",System.Text.Encoding.UTF8.GetBytes(msg),false,1,true);
+			testClient.subscriptionHandler(new {},evt);
+			
+			string msgCancel = "{\"reqId\":\"980c9013-6e91-4d9c-898b-a9c4709a4708\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\"}]}}";
+			MqttMsgPublishEventArgs evtCancel = new MqttMsgPublishEventArgs("iotdm-1/type/"+deviceType+"/id/"+deviceID+"/cancel",System.Text.Encoding.UTF8.GetBytes(msgCancel),false,1,true);
+			testClient.subscriptionHandler(new {},evtCancel);
+		
+			Assert.AreEqual(recivedAction,"update");
+			Assert.AreEqual(reqId,"980c9013-6e91-4d9c-898b-a9c4709a4708");
+			Assert.AreEqual(connectedDevice,deviceID);
+			Assert.AreEqual(connectedDeviceType,deviceType);
+			Assert.IsTrue(wasCalled);
+		}
+		
 	}
 }

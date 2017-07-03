@@ -522,6 +522,11 @@ namespace IBMWIoTP
         		return false;
         	}
         }
+        
+        
+        public ApiClient GetAPIClient(){
+        	return new ApiClient(_apiKey , _authToken);
+        }
 
     }
 

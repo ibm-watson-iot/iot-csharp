@@ -1,0 +1,5 @@
+## Application Registration detail
+Organization-ID = <Your Organization ID>
+App-ID = <Your App id>
+Api-Key = <Your Api key>
+Authentication-Token = <Your Api Token>

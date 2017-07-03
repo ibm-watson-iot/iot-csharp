@@ -111,5 +111,10 @@ namespace test
 			testApp.disconnect();
 			Assert.IsFalse(testApp.isConnected());
 		}
+		[Test]
+		public void ApplicationClientgetApiClient(){
+			IBMWIoTP.ApiClient cli = testApp.GetAPIClient();
+			Assert.IsInstanceOf<IBMWIoTP.ApiClient>(cli);
+		}
 	}
 }

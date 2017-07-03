@@ -174,6 +174,52 @@ namespace IBMWIoTP
 	
 	
 	
+	public class DMRequest
+	{
+		public  DMRequest()
+		{
+		}
+		public  DMRequest(string reqId, string topic ,string json)
+		{
+			this.reqID = reqId;
+			this.topic = topic;
+			this.json =json;
+		}
+		public string reqID {get;set;}
+		public string topic {get;set;}
+		public string json {get;set;}
+	}
+	
+	public class DMResponse
+	{
+		public DMResponse()
+		{
+		}
+		public string reqId {get;set;}
+		public string rc {get;set;}
+		
+	}
+
+	public class DMField {
+		public DMField(){
+		}
+	
+		public string field {get;set;}
+		public DeviceFirmware value {get;set;}
+	}
+	public class DMFields {
+		public DMFields(){
+		}
+		public DMField [] fields;
+	}
+	public class DeviceActionReq{
+	
+		public DeviceActionReq(){
+		}
+		public string reqId {get;set;}
+		public DMFields d {get;set;}
+	}
+	
 	
 	
 //	public class OrgInfo {

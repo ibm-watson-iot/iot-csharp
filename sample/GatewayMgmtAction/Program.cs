@@ -26,15 +26,15 @@ namespace GatewayMgmtAction
 			string authKey = "";
 			bool isSync = true;
 			
-			Console.WriteLine("Device Management Sample");
+			Console.WriteLine("Gateway Management Action Sample");
 		 	
 			Console.Write("Enter your org id :");
         	orgID = Console.ReadLine();
         	
-        	Console.Write("Enter your device type :");
+        	Console.Write("Enter your gateway type :");
         	deviceType = Console.ReadLine();
 
-        	Console.Write("Enter your device id :");
+        	Console.Write("Enter your gateway id :");
         	deviceId = Console.ReadLine();
 
         	Console.Write("Enter your auth key :");
@@ -97,7 +97,7 @@ namespace GatewayMgmtAction
 			Console.WriteLine("Manage");
 			gwMgmtClient.managedGateway(4000,true,true);
 		
-			//Console.Write("Press any key to exit . . . ");
+//			Console.Write("Press any key to exit . . . ");
 			Console.ReadKey();
 //			gwMgmtClient.disconnect();
 			

@@ -24,7 +24,7 @@ namespace IBMWIoTP
 	/// </summary>
 	public class ApiClient
 	{
-		ILog log = log4net.LogManager.GetLogger(typeof(ApplicationClient));
+		ILog log = log4net.LogManager.GetLogger(typeof(ApiClient));
 		private static string BaseURL = "https://{0}.internetofthings.ibmcloud.com/api/v0002";
 		
 		private static string OrgInfo = "/";

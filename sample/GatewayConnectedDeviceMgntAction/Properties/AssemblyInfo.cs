@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("IBMWIoTP")]
-[assembly: AssemblyDescription("C# Library to simplify interactions with the IBM Watson IoT Platform")]
+[assembly: AssemblyTitle("GatewayConnectedDeviceMgntAction")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("IBM")]
-[assembly: AssemblyProduct("IBMWIoTP")]
-[assembly: AssemblyCopyright("Copyright (c) 2017 IBM Corporation")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("GatewayConnectedDeviceMgntAction")]
+[assembly: AssemblyCopyright("Copyright 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -28,7 +28,4 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can use the default the Revision and 
 // Build Numbers by using the '*' as shown below:
-[assembly: AssemblyVersion("0.2.2")]
-
-// For log4net
-[assembly: log4net.Config.XmlConfigurator(ConfigFile="IBMWIoTPLog.config",Watch=true)]
+[assembly: AssemblyVersion("1.0.*")]
