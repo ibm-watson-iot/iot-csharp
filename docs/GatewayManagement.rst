@@ -14,8 +14,10 @@ Gateway plays an important role in the device management of devices connected to
 For example, It is unlikely that a device connected to a gateway will be able to download the firmware itself. In this case, the gateway’s device management agent will intercept the request to download the firmware and perform the download to its own storage. Then, when the device is instructed to perform the upgrade, the gateway’s device management agent will push the firmware to the device and update it.
 
 This section contains information on how gateways (and attached devices) can connect to the Internet of Things Platform Device Management service using C# and perform device management operations like firmware update, location update, and diagnostics update.
+
 Create DeviceData
 ------------------------------------------------------------------------
+
 The `device model <https://docs.internetofthings.ibmcloud.com/reference/device_model.html>`__ describes the metadata and management characteristics of a device. The device database in the IBM Watson IoT Platform Connect is the master source of device information. Applications and managed devices are able to send updates to the database such as a location or the progress of a firmware update. Once these updates are received by the IBM Watson IoT Platform Connect, the device database is updated, making the information available to applications.
 
 The device model in the IBMWIoTP client library is represented as DeviceInfo.
@@ -24,16 +26,16 @@ The following code snippet shows how to create the mandatory object DeviceInfo a
 
 .. code:: C#
 
-  DeviceInfo simpleDeviceInfo = new DeviceInfo();
-  simpleDeviceInfo.description = "My device";
-  simpleDeviceInfo.deviceClass = "My device class";
-  simpleDeviceInfo.manufacturer = "My device manufacturer";
-  simpleDeviceInfo.fwVersion = "Device Firmware Version";
-  simpleDeviceInfo.hwVersion = "Device HW Version";
-  simpleDeviceInfo.model = "My device model";
-  simpleDeviceInfo.serialNumber = "12345";
+	DeviceInfo simpleDeviceInfo = new DeviceInfo();
+	simpleDeviceInfo.description = "My device";
+	simpleDeviceInfo.deviceClass = "My device class";
+	simpleDeviceInfo.manufacturer = "My device manufacturer";
+	simpleDeviceInfo.fwVersion = "Device Firmware Version";
+	simpleDeviceInfo.hwVersion = "Device HW Version";
+	simpleDeviceInfo.model = "My device model";
+	simpleDeviceInfo.serialNumber = "12345";
 
-  GatewayManagement gwMgmtClient =new GatewayManagement(orgId,gatewayDeviceType,gatewayDeviceID,authmethod,authtoken,isSync);
+	GatewayManagement gwMgmtClient =new GatewayManagement(orgId,gatewayDeviceType,gatewayDeviceID,authmethod,authtoken,isSync);
 	gwMgmtClient.deviceInfo = simpleDeviceInfo;
 	gwMgmtClient.connect();
 
@@ -51,11 +53,11 @@ ManagedGateway exposes 2 different constructors to support different user patter
 
 Constructs a ManagedGateway instance by accepting the DeviceData and the following properties,
 
-* Organization-ID - Your organization ID.
-* Gateway-Type - The type of your gateway device.
-* Gateway-ID - The ID of your gateway device.
-* Authentication-Method - Method of authentication (The only value currently supported is "token").
-* Authentication-Token - API key token
+* ``Organization-ID`` - Your organization ID.
+* ``Gateway-Type`` - The type of your gateway device.
+* ``Gateway-ID`` - The ID of your gateway device.
+* ``Authentication-Method`` - Method of authentication (The only value currently supported is "token").
+* ``Authentication-Token`` - API key token
 
 And isSync as optional parameters which in case of true all managed request will be performed synchronously.
 
@@ -81,8 +83,8 @@ Register Callback
 ------------------------------------------------
 In order to track the response of the management request we need to register a call back method.When ever an response for the manage request comes this call back function is called with two parameters
 
-* request Id - To identify the management request
-* response status - status of response
+* ``requestId`` - To identify the management request
+* ``responceCode`` - status of response
 
 Each device management request method will return an unique request id which helps to identify the corresponding response.
 Following are the status code for the device Management response,
@@ -96,20 +98,19 @@ The following code shows how to create a callback instance:
 
 .. code:: C#
 
-  GatewayManagement gwMgmtClient =new GatewayManagement(orgId,gatewayDeviceType,gatewayDeviceID,authmethod,authtoken,isSync);
-  gwMgmtClient.deviceInfo = simpleDeviceInfo;
-  gwMgmtClient.mgmtCallback += processMgmtResponce;
-  gwMgmtClient.connect();
+	GatewayManagement gwMgmtClient =new GatewayManagement(orgId,gatewayDeviceType,gatewayDeviceID,authmethod,authtoken,isSync);
+	gwMgmtClient.deviceInfo = simpleDeviceInfo;
+	gwMgmtClient.mgmtCallback += processMgmtResponce;
+	gwMgmtClient.connect();
 
-  .........
-  .........
-  .........
+	.........
+	.........
+	.........
 
-  public static void processMgmtResponce( string reqestId, string responceCode){
-  			Console.WriteLine("req Id:" + reqestId +"	responceCode:"+ responceCode);
-  		}
+	public static void processMgmtResponce( string reqestId, string responceCode){
+		Console.WriteLine("req Id:" + reqestId +"responceCode:"+ responceCode);
+	}
 
-----
 
 Manage request - gateway
 -------------------------------------------------------
@@ -117,10 +118,11 @@ Manage request - gateway
 The gateway can invoke managedGateway() method to participate in device management activities. The manage request will initiate a connect request internally if the device is not connected to the IBM Watson Internet of Things Platform already.
 
 Manage method will take following parameters,
-* *lifetime* The length of time in seconds within which the gateway must send another **Manage** request in order to avoid being reverted to an unmanaged device and marked as dormant. If set to 0, the managed gateway will not become dormant. When set, the minimum supported setting is 3600 (1 hour).
-* *supportFirmwareActions* Tells whether the gateway supports firmware actions or not. The gateway must add a firmware handler to handle the firmware requests.
-* *supportDeviceActions* Tells whether the gateway supports Device actions or not. The gateway must add a Device action handler to handle the reboot and factory reset requests.
-* metaData(Optional) - meta data object of the device that provide device meta information.
+
+* ``lifetime``- The length of time in seconds within which the gateway must send another **Manage** request in order to avoid being reverted to an unmanaged device and marked as dormant. If set to 0, the managed gateway will not become dormant. When set, the minimum supported setting is 3600 (1 hour).
+* ``supportFirmwareActions`` - Tells whether the gateway supports firmware actions or not. The gateway must add a firmware handler to handle the firmware requests.
+* ``supportDeviceActions``- Tells whether the gateway supports Device actions or not. The gateway must add a Device action handler to handle the reboot and factory reset requests.
+* ``metaData`` (Optional) - meta data object of the device that provide device meta information.
 
 .. code:: C#
 
@@ -278,7 +280,7 @@ and to clear the Logs of attached devices, invoke the clearDeviceLogs() method w
 The device diagnostics operations are intended to provide information on gateway/device errors, and does not provide diagnostic information relating to the devices connection to the IBM Watson Internet of Things Platform.
 
 Refer to the `documentation <https://docs.internetofthings.ibmcloud.com/devices/device_mgmt/index.html#/update-location#update-location>`__ for more information about the Diagnostics operation.
-----
+
 
 Firmware Actions
 -------------------------------------------------------------
@@ -465,7 +467,8 @@ The created handler needs to be added to the ManagedGateway instance so that the
 	gwMgmtClient.actionCallback += processDeviceAction;
 
 
-For Gateway connected device's Device Management please refer sample `GatewayConnectedDeviceMgntAction`<https://github.com/ibm-watson-iot/iot-csharp/tree/master/sample/GatewayConnectedDeviceMgntAction>
+For Gateway connected device's Device Management please refer sample `GatewayConnectedDeviceMgntAction <https://github.com/ibm-watson-iot/iot-csharp/tree/master/sample/GatewayConnectedDeviceMgntAction>`__ .
+
 Refer to `this page <https://docs.internetofthings.ibmcloud.com/devices/device_mgmt/requests.html#/device-actions-reboot#device-actions-reboot>`__ for more information about the Device Action.
 
 ----
