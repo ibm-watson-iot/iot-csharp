@@ -61,8 +61,8 @@ To subscribe to a specific event from two or more different devices
 
 .. code:: C#
 
-    applicationClient.connect();
-   applicationClient.subscribeToDeviceEvents(deviceType, deviceId, evtName);
+        applicationClient.connect();
+        applicationClient.subscribeToDeviceEvents(deviceType, deviceId, evtName);
 
 
 To subscribe to all events published by a device in json format
@@ -110,7 +110,7 @@ Subscribe to status updates for all devices
 .. code:: C#
 
    applicationClient.connect();
-   applicationClient.deviceStatusCallback += processDeviceStatus;
+   applicationClient.deviceStatusCallback  += processDeviceStatus;
    applicationClient.subscribeToDeviceStatus();
 
 
@@ -120,7 +120,7 @@ Subscribe to status updates for two different devices
 .. code:: C#
 
     applicationClient.connect();
-    applicationClient.subscribeToDeviceStatus += processDeviceStatus;
+    applicationClient.deviceStatusCallback += processDeviceStatus;
     applicationClient.subscribeToDeviceStatus(deviceType, deviceId);
 
 
