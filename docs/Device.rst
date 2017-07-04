@@ -12,6 +12,7 @@ Constructor
 The constructor builds the client instance, and there are two different ways of connecting a device to IBM Watson IoT Platform. Accordingly, we have two overloaded constructors for that
 
 **Quick Start**
+
 To connect device in quick start mode, we need to create client instance with two arguments
 * device Type
 * device id
@@ -22,7 +23,7 @@ To connect device in quick start mode, we need to create client instance with tw
  	deviceClient.connect();
 
 
-** Registered **
+**Registered**
 
 To connect device in Registered mode,we need to create client instance with the following definitions:
 
@@ -35,8 +36,8 @@ To connect device in Registered mode,we need to create client instance with the 
 
 .. code:: C#
 
-deviceClient = new DeviceClient(orgId,deviceType,deviceId,"token",authToken);
-deviceClient.connect();
+	deviceClient = new DeviceClient(orgId,deviceType,deviceId,"token",authToken);
+	deviceClient.connect();
 
 
 
@@ -52,9 +53,8 @@ Publish event using default quality of service
 ----------------------------------------------
 .. code:: C#
 
-
 	deviceClient.connect();
-    deviceClient.publishEvent("event", "json", "{temp:23}");
+	deviceClient.publishEvent("event", "json", "{temp:23}");
 
 
 Publish event using user-defined quality of service
@@ -64,7 +64,7 @@ Events can be published at higher MQTT quality of service levels, but events pub
 .. code:: C#
 
 	deviceClient.connect();
-    deviceClient.publishEvent("event", "json", "{temp:23}", 2);
+	deviceClient.publishEvent("event", "json", "{temp:23}", 2);
 
 
 Handling commands
@@ -75,11 +75,9 @@ To process specific commands, you must register a command callback method also s
 .. code:: C#
 
 	public static void processCommand(string cmdName, string format, string data) {
-    ...
-  }
-
-.. code:: C#
-
+	    ...
+	}
+        ...
 	deviceClient.connect();
 	deviceClient.subscribeCommand("your command name", "your command format", 0);
 	deviceClient.commandCallback += processCommand;
