@@ -79,15 +79,15 @@ Handling events from devices
 
 To process the events received by your subscriptions you need to register an event callback method.
 
-- ``device Type `` - string (identifies the device type across all types of devices in the organization)
-- ``device Id `` - string (uniquely identifies the device across all devices of the above type in the organization)
+- ``deviceType`` - string (identifies the device type across all types of devices in the organization)
+- ``deviceId`` - string (uniquely identifies the device across all devices of the above type in the organization)
 - ``eventName`` - string
 - ``eventFormat`` - string
 - ``eventData`` - string
 
 .. code:: C#
 
-    public static void processEvent(string deviceType,string deviceId ,String eventName, string format, string data) {
+    public static void processEvent(string deviceType,string deviceId ,string eventName, string format, string data) {
         // Do something
     }
 
@@ -130,16 +130,16 @@ To process the status updates received by your subscriptions you need to registe
 
 .. code:: C#
 
-    public static void processDeviceStatus(String deviceType, string deviceId, string data)
-        {
-           //
-        }
+       public static void processDeviceStatus(string deviceType, string deviceId, string data)
+       {
+
+       }
 
 
-    applicationClient.connect();
+       applicationClient.connect();
 
-    applicationClient.appStatusCallback += processAppStatus;
-    applicationClient.subscribeToApplicationStatus();
+       applicationClient.appStatusCallback += processAppStatus;
+       applicationClient.subscribeToApplicationStatus();
 
 
 ----
