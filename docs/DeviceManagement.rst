@@ -26,7 +26,6 @@ The `device management <https://docs.internetofthings.ibmcloud.com/devices/devic
 * **Unmanaged Devices** are any devices which do not have a device management agent. All devices begin their life-cycle as unmanaged devices, and can transition to managed devices by sending a message from a device management agent to the IBM Watson IoT Platform Connect.
 
 
----------------------------------------------------------------------------
 Connecting to the IBM Watson IoT Platform Connect Device Management Service
 ---------------------------------------------------------------------------
 
@@ -49,7 +48,7 @@ The following code snippet shows how to create the mandatory object DeviceInfo a
   simpleDeviceInfo.model = "My device model";
   simpleDeviceInfo.serialNumber = "<your device id>5";
 
-  DeviceManagement	deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
+  DeviceManagement deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
   deviceClient.deviceInfo = simpleDeviceInfo;
   deviceClient.connect();
 
@@ -61,13 +60,13 @@ DeviceManagement exposes the following constructor to support different user pat
 
 Constructs a DeviceManagement instance by accepting the following parameters,
 
-* org - Your organization ID.
-* type - The type of your device.
-* id - The ID of your device.
-* auth-method - Method of authentication (The only value currently supported is "token").
-* auth-token - Auth Token
+* ``org`` - Your organization ID.
+* ``type`` - The type of your device.
+* ``id`` - The ID of your device.
+* ``auth-method`` - Method of authentication (The only value currently supported is "token").
+* ``auth-token`` - Auth Token
 
-And isSync as optional parameters which in case of true all managed request will be performed synchronously.
+And ``isSync`` as optional parameters which in case of true all managed request will be performed synchronously.
 
 All these properties are required to interact with the IBM Watson IoT Platform Connect.
 
@@ -75,14 +74,14 @@ The following code shows how to create a DeviceManagement instance:
 
 .. code:: C#
 
-  string orgID = "<your org id>";
-  string deviceType = "<your device type>";
-  string deviceId = "<your gateway auth token>";
-  string authType = "token";
-  string authKey = "<your auth key >";
-  bool isSync = true;
+	string orgID = "<your org id>";
+	string deviceType = "<your device type>";
+	string deviceId = "<your gateway auth token>";
+	string authType = "token";
+	string authKey = "<your auth key >";
+	bool isSync = true;
 
-  DeviceManagement	deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
+	DeviceManagement deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
 	deviceClient.deviceInfo = simpleDeviceInfo;
 	deviceClient.connect();
 
@@ -105,18 +104,18 @@ The following code shows how to create a callback instance:
 
 .. code:: C#
 
-    DeviceManagement	deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
-    deviceClient.deviceInfo = simpleDeviceInfo;
-    deviceClient.mgmtCallback += processMgmtResponce;
-    deviceClient.connect();
+	DeviceManagement deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
+	deviceClient.deviceInfo = simpleDeviceInfo;
+	deviceClient.mgmtCallback += processMgmtResponce;
+	deviceClient.connect();
 
-    .........
-    .........
-    .........
+	.........
+	.........
+	.........
 
-    public static void processMgmtResponce( string reqestId, string responceCode){
-    		Console.WriteLine("req Id:" + reqestId +"	responceCode:"+ responceCode);
-    	}
+	public static void processMgmtResponce( string reqestId, string responceCode){
+		Console.WriteLine("req Id:" + reqestId +"responceCode:"+ responceCode);
+	}
 
 
 Manage
