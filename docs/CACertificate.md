@@ -21,13 +21,13 @@ We need a self-signed Certificate Authority (CA) Certificate and a Client Certif
 * Generate the key for the CA certificate:
 
 ```
-    openssl genrsa -out rootCA.key 2048
+openssl genrsa -out rootCA.key 2048
 ```
 
 * Create the self-signed CA certificate using the above generated key:
 
 ```
-    openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 1024 -out rootCA.pem
+openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 1024 -out rootCA.pem
 ```
 
 * Then the created CA certificate has to be combined with it’s key to generate a single Personal Information Exchange (pfx) file:
@@ -49,7 +49,6 @@ openssl genrsa -out client.key 2048
 
 ```
 openssl req -new -key client.key -out client.csr
-
 ```
 
 * Generate the Client certificate by signing the Certificate Signing Request (CSR) using CA certificate and CA key.
