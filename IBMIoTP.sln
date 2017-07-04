@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewayMgmtAction", "sample
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewayConnectedDeviceMgntAction", "sample\GatewayConnectedDeviceMgntAction\GatewayConnectedDeviceMgntAction.csproj", "{6F323813-9137-4745-B798-6DD57C181036}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientCA_Authentication", "sample\ClentCA_Authentication\ClientCA_Authentication.csproj", "{EDBA2F8F-3C83-4FA2-80E7-7997304602EC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientCA_Authentication", "sample\ClientCA_Authentication\ClientCA_Authentication.csproj", "{EDBA2F8F-3C83-4FA2-80E7-7997304602EC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IBMWIoTP", "src\IBMWIoTP\IBMWIoTP.csproj", "{A41D9542-C3DF-422C-8293-457EEE710A90}"
 EndProject
