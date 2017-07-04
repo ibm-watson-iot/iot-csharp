@@ -11,11 +11,11 @@ Constructor
 
 The constructor builds the Gateway client instance, and accepts a Properties object containing the following definitions:
 
-* org - Your organization ID.
-* type - The type of your Gateway device.
-* id - The ID of your Gateway.
-* auth-method - Method of authentication (The only value currently supported is "token").
-* auth-token - API key token.
+* ``org`` - Your organization ID.
+* ``type`` - The type of your Gateway device.
+* ``id`` - The ID of your Gateway.
+* ``auth-method`` - Method of authentication (The only value currently supported is "token").
+* ``auth-token`` - API key token.
 
 The Properties object creates definitions which are used to interact with the Watson Internet of Things Platform module.
 
@@ -113,11 +113,11 @@ The Gateway can subscribe to commands directed at the gateway itself and to any 
 
 To process specific commands you need to register a command callback method. The messages are returned as an instance of the Command class which has the following properties:
 
-* deviceType - The device type for which the command is received.
-* deviceId - The device id for which the command is received, Could be the Gateway or any device connected via the Gateway.
-* payload - The command payload.
-* format - The format of the command payload, currently only JSON format is supported in the C# Client Library.
-* command - The name of the command.
+* ``deviceType`` - The device type for which the command is received.
+* ``deviceId`` - The device id for which the command is received, Could be the Gateway or any device connected via the Gateway.
+* ``payload`` - The command payload.
+* ``format`` - The format of the command payload, currently only JSON format is supported in the C# Client Library.
+* ``command`` - The name of the command.
 
 
 A sample implementation of the Command callback is shown below,
@@ -142,20 +142,20 @@ Handling Errors
 When errors occur during the validation of the publish or subscribe topic, or during automatic registration, a notification will be sent to the gateway device.
 For consuming those notification an callback should be registered, this callback method will be called whenever the notification is received.Callback method has three parameters,
 
-* deviceType
-* deviceId
-* GatewayError object
+* ``deviceType``
+* ``deviceId``
+* ``GatewayError object``
 
 GatewayError object contains following properties describing the error occurred,
 
-*    Request: Request type Either publish or subscribe
-*    Time: Timestamp in ISO 8601 Format
-*    Topic: The request topic from the gateway
-*    Type: The device type from the topic
-*    Id: The device id from the topic
-*    Client: The client id of the request
-*    RC: The return code
-*    Message: The error message
+*    ``Request``: Request type Either publish or subscribe
+*    ``Time``: Timestamp in ISO 8601 Format
+*    ``Topic``: The request topic from the gateway
+*    ``Type``: The device type from the topic
+*    ``Id``: The device id from the topic
+*    ``Client``: The client id of the request
+*    ``RC``: The return code
+*    ``Message``: The error message
 
 A sample implementation of the error callback is shown below,
 
