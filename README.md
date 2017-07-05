@@ -70,4 +70,4 @@ You can find samples in each of the corresponding repositories as follows:
 License
 -----------------------
 
-The library is shipped with Eclipse Public License and refer to the [License file] (LICENSE) for more information about the licensing.
+The library is shipped with Eclipse Public License and refer to the [License file](LICENSE) for more information about the licensing.
