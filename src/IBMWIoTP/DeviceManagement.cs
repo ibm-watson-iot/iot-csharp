@@ -51,25 +51,34 @@ namespace IBMWIoTP
 		const string DM_FIRMWARE_UPDATE_TOPIC = "iotdm-1/mgmt/initiate/firmware/update";
 		
 		//ResponseCode 
-		public static int RESPONSECODE_FUNCTION_NOT_SUPPORTED = 501;
-		public static int RESPONSECODE_ACCEPTED = 202;
-		public static int RESPONSECODE_INTERNAL_ERROR = 500;
-		public static int RESPONSECODE_BAD_REQUEST = 400;
+		public const int RESPONSECODE_FUNCTION_NOT_SUPPORTED = 501;
+		public const int RESPONSECODE_ACCEPTED = 202;
+		public const int RESPONSECODE_INTERNAL_ERROR = 500;
+		public const int RESPONSECODE_BAD_REQUEST = 400;
 		
-		public static int UPDATESTATE_IDLE = 0;
-		public static int UPDATESTATE_DOWNLOADING = 1;
-		public static int UPDATESTATE_DOWNLOADED = 2;
-		public static int UPDATESTATE_SUCCESS = 0;
-		public static int UPDATESTATE_IN_PROGRESS = 1;
-		public static int UPDATESTATE_OUT_OF_MEMORY = 2;
-		public static int UPDATESTATE_CONNECTION_LOST = 3;
-		public static int UPDATESTATE_VERIFICATION_FAILED = 4;
-		public static int UPDATESTATE_UNSUPPORTED_IMAGE = 5;
-		public static int UPDATESTATE_INVALID_URI = 6;
+		public const int UPDATESTATE_IDLE = 0;
+		public const int UPDATESTATE_DOWNLOADING = 1;
+		public const int UPDATESTATE_DOWNLOADED = 2;
+		public const int UPDATESTATE_SUCCESS = 0;
+		public const int UPDATESTATE_IN_PROGRESS = 1;
+		public const int UPDATESTATE_OUT_OF_MEMORY = 2;
+		public const int UPDATESTATE_CONNECTION_LOST = 3;
+		public const int UPDATESTATE_VERIFICATION_FAILED = 4;
+		public const int UPDATESTATE_UNSUPPORTED_IMAGE = 5;
+		public const int UPDATESTATE_INVALID_URI = 6;
+		
+		public const string ACTION_RESET = "reset";
+		public const string ACTION_REBOOT = "reboot";
+
+		
+		public const string FIRMWARE_ACTION_INFO = "info";
+		public const string FIRMWARE_ACTION_DOWNLOAD = "download";
+		public const string FIRMWARE_ACTION_UPDATE = "update";
+		
 				
 		public DeviceInfo deviceInfo = new DeviceInfo();
 		public LocationInfo locationInfo = new LocationInfo();
-		List<DMRequest> collection = new List<IBMWIoTP.DeviceManagement.DMRequest>();
+		List<DMRequest> collection = new List<DMRequest>();
 		ManualResetEvent oSignalEvent = new ManualResetEvent(false);
 		bool isSync = false;
 		ILog log = log4net.LogManager.GetLogger(typeof(DeviceManagement));
@@ -132,52 +141,6 @@ namespace IBMWIoTP
 		}
 		
 		
-		class DMRequest
-		{
-			public  DMRequest()
-			{
-			}
-			public  DMRequest(string reqId, string topic ,string json)
-			{
-				this.reqID = reqId;
-				this.topic = topic;
-				this.json =json;
-			}
-			public string reqID {get;set;}
-			public string topic {get;set;}
-			public string json {get;set;}
-		}
-		
-		class DMResponse
-		{
-			public DMResponse()
-			{
-			}
-			public string reqId {get;set;}
-			public string rc {get;set;}
-			
-		}
-		
-		class DMField {
-			public DMField(){
-			}
-		
-			public string field {get;set;}
-			public DeviceFirmware value {get;set;}
-		}
-		class DMFields {
-			public DMFields(){
-			}
-			public DMField [] fields;
-		}
-		class DeviceActionReq{
-		
-			public DeviceActionReq(){
-			}
-			public string reqId {get;set;}
-			public DMFields d {get;set;}
-		}
-
 		private void subscribeTOManagedTopics(){
 			if(mqttClient.IsConnected)
 			{
@@ -261,7 +224,9 @@ namespace IBMWIoTP
 						 msg ="";
 						if(this.fw.state != UPDATESTATE_IDLE){
 							rc = RESPONSECODE_BAD_REQUEST;
-							msg = "Cannot download as the device is not in idle state";							
+							msg = "Cannot download as the device is not in idle state";		
+							sendResponse(fwData.reqId,rc,msg);
+							break;
 						}
 						if(this.fwCallback != null)
 						{
@@ -275,7 +240,9 @@ namespace IBMWIoTP
 						 msg ="";
 						if(this.fw.state != UPDATESTATE_DOWNLOADED){
 							rc = RESPONSECODE_BAD_REQUEST;
-							msg = "Firmware is still not successfully downloaded.";							
+							msg = "Firmware is still not successfully downloaded.";		
+							sendResponse(fwData.reqId,rc,msg);
+							break;
 						}
 						if(this.fwCallback != null)
 						{
@@ -297,7 +264,7 @@ namespace IBMWIoTP
 			}
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occer in subscriptionHandler ",ex);
+        		log.Error("Execption has occurred in subscriptionHandler ",ex);
         	}
 
         }
@@ -346,7 +313,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in manage ",e);
+        		throw new Exception("Execption has occurred in manage ",e);
         		return "";
         	}
 		
@@ -378,7 +346,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in manage ",e);
+        		throw new Exception("Execption has occurred in manage ",e);
         		return "";
         	}
 			
@@ -397,7 +366,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in unmanage ",e);
+        		throw new Exception("Execption has occurred in unmanage ",e);
         		return "";
         	}
 		}
@@ -420,7 +390,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addErrorCode ",e);
+        		throw new Exception("Execption has occurred in addErrorCode ",e);
         		return "";
         	}
 		}
@@ -440,7 +411,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearErrorCode ",e);
+        		throw new Exception("Execption has occurred in clearErrorCode ",e);
         		return "";
         	}
 		}
@@ -468,7 +440,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addLog ",e);
+        		throw new Exception("Execption has occurred in addLog ",e);
         		return "";
         	}
 		}
@@ -488,7 +461,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearLog ",e);
+        		throw new Exception("Execption has occurred in clearLog ",e);
         		return "";
         	}
 		}
@@ -517,7 +491,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in setLocation ",e);
+        		throw new Exception("Execption has occurred in setLocation ",e);
         		return "";
         	}
 		}

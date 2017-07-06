@@ -286,7 +286,7 @@ namespace test
 				testClient.setUpdateState(IBMWIoTP.DeviceManagement.UPDATESTATE_SUCCESS);
 				
 			};
-			string msgUpdate = "{\"reqId\":\"980c9013-6e91-4d9c-898b-a9c4709a4708\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\",\"value\":{\"version\":\"\",\"name\":\"\",\"uri\":\"https://test.com/file.dll\",\"verifier\":\"\",\"state\":0,\"updateStatus\":0,\"updatedDateTime\":\"\"}}],\"action\":\"firmware/update\"}}";
+			string msgUpdate = "{\"reqId\":\"980c9013-6e91-4d9c-898b-a9c4709a4708\",\"d\":{\"fields\":[{\"field\":\"mgmt.firmware\",\"value\":{\"version\":\"\",\"name\":\"\",\"uri\":\"https://test.com/file.dll\",\"verifier\":\"\",\"state\":2,\"updateStatus\":0,\"updatedDateTime\":\"\"}}],\"action\":\"firmware/update\"}}";
 			MqttMsgPublishEventArgs evtUpdate = new MqttMsgPublishEventArgs("iotdm-1/device/update",System.Text.Encoding.UTF8.GetBytes(msgUpdate),false,1,true);
 			testClient.subscriptionHandler(new {},evtUpdate);
 			

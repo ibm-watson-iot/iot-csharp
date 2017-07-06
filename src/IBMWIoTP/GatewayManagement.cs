@@ -61,22 +61,38 @@ namespace IBMWIoTP
 		const string DM_FIRMWARE_DOWNLOAD_TOPIC = "iotdm-1/type/{0}/id/{1}/mgmt/initiate/firmware/download";
 		const string DM_FIRMWARE_UPDATE_TOPIC = "iotdm-1/type/{0}/id/{1}/mgmt/initiate/firmware/update";
 		
+		const string DM_RESPONSE_TOPIC_REGX = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/response)";
+		const string DM_OBSERVE_TOPIC_REGX = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/observe)";
+		const string DM_REBOOT_TOPIC_REGX = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/mgmt/initiate/device/reboot)";
+		const string DM_FACTORY_RESET_REGX = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/mgmt/initiate/device/factory_reset)";
+		const string DM_UPDATE_TOPIC_REGX = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/device/update)";
+		const string DM_CANCEL_OBSERVE_TOPIC_REGX = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/cancel)";
+		const string DM_FIRMWARE_DOWNLOAD_TOPIC_REGX = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/mgmt/initiate/firmware/download)";
+		const string DM_FIRMWARE_UPDATE_TOPIC_REGX = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/mgmt/initiate/firmware/update)";
 		//ResponseCode 
-		public static int RESPONSECODE_FUNCTION_NOT_SUPPORTED = 501;
-		public static int RESPONSECODE_ACCEPTED = 202;
-		public static int RESPONSECODE_INTERNAL_ERROR = 500;
-		public static int RESPONSECODE_BAD_REQUEST = 400;
+		public const int RESPONSECODE_FUNCTION_NOT_SUPPORTED = 501;
+		public const int RESPONSECODE_ACCEPTED = 202;
+		public const int RESPONSECODE_INTERNAL_ERROR = 500;
+		public const int RESPONSECODE_BAD_REQUEST = 400;
 		
-		public static int UPDATESTATE_IDLE = 0;
-		public static int UPDATESTATE_DOWNLOADING = 1;
-		public static int UPDATESTATE_DOWNLOADED = 2;
-		public static int UPDATESTATE_SUCCESS = 0;
-		public static int UPDATESTATE_IN_PROGRESS = 1;
-		public static int UPDATESTATE_OUT_OF_MEMORY = 2;
-		public static int UPDATESTATE_CONNECTION_LOST = 3;
-		public static int UPDATESTATE_VERIFICATION_FAILED = 4;
-		public static int UPDATESTATE_UNSUPPORTED_IMAGE = 5;
-		public static int UPDATESTATE_INVALID_URI = 6;
+		public const int UPDATESTATE_IDLE = 0;
+		public const int UPDATESTATE_DOWNLOADING = 1;
+		public const int UPDATESTATE_DOWNLOADED = 2;
+		public const int UPDATESTATE_SUCCESS = 0;
+		public const int UPDATESTATE_IN_PROGRESS = 1;
+		public const int UPDATESTATE_OUT_OF_MEMORY = 2;
+		public const int UPDATESTATE_CONNECTION_LOST = 3;
+		public const int UPDATESTATE_VERIFICATION_FAILED = 4;
+		public const int UPDATESTATE_UNSUPPORTED_IMAGE = 5;
+		public const int UPDATESTATE_INVALID_URI = 6;
+		
+		public const string ACTION_RESET = "reset";
+		public const string ACTION_REBOOT = "reboot";
+
+		
+		public const string FIRMWARE_ACTION_INFO = "info";
+		public const string FIRMWARE_ACTION_DOWNLOAD = "download";
+		public const string FIRMWARE_ACTION_UPDATE = "update";
 		
 		public DeviceInfo deviceInfo = new DeviceInfo();
 		public LocationInfo locationInfo = new LocationInfo();
@@ -140,53 +156,7 @@ namespace IBMWIoTP
 			base.connect();
 			suscribeTOManagedTopics();
 		}
-		
-		class DMRequest
-		{
-			public  DMRequest()
-			{
-			}
-			public  DMRequest(string reqId, string topic ,string json)
-			{
-				this.reqID = reqId;
-				this.topic = topic;
-				this.json =json;
-			}
-			public string reqID {get;set;}
-			public string topic {get;set;}
-			public string json {get;set;}
-		}
-		
-		class DMResponse
-		{
-			public DMResponse()
-			{
-			}
-			public string reqId {get;set;}
-			public string rc {get;set;}
-			
-		}
-
-		class DMField {
-			public DMField(){
-			}
-		
-			public string field {get;set;}
-			public DeviceFirmware value {get;set;}
-		}
-		class DMFields {
-			public DMFields(){
-			}
-			public DMField [] fields;
-		}
-		class DeviceActionReq{
-		
-			public DeviceActionReq(){
-			}
-			public string reqId {get;set;}
-			public DMFields d {get;set;}
-		}
-		
+	
 		private void suscribeTOManagedTopics(){
 			if(mqttClient.IsConnected)
 			{
@@ -203,16 +173,19 @@ namespace IBMWIoTP
 		public void subscriptionHandler(object sender, MqttMsgPublishEventArgs e)
         {
 			try{
-				
+
 	            string result = System.Text.Encoding.UTF8.GetString(e.Message);
+				log.Info(e.Topic+ "  with  " + result);
+	            
 	            var serializer  = new System.Web.Script.Serialization.JavaScriptSerializer();
 	            DeviceActionReq fwData;
 				int rc;
 				string msg ;
-				string pat = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/response)";
-
+				//string pat = @"(^iotdm-1/type/)(.*)(/id/)(.*)(/response)";
+				Regex regx ;
+				Match match;
 		      // Instantiate the regular expression object.
-		      	Regex regx = new Regex(pat, RegexOptions.IgnoreCase);
+		      	regx = new Regex(DM_RESPONSE_TOPIC_REGX, RegexOptions.IgnoreCase);
 				//if(e.Topic == string.Format(DM_RESPONSE_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID) ){
 				if(regx.IsMatch(e.Topic )){
 			            var response = serializer.Deserialize<DMResponse>(result);
@@ -229,81 +202,146 @@ namespace IBMWIoTP
 			            	oSignalEvent.Dispose();
 			            	oSignalEvent = new ManualResetEvent(false);
 			            }
+			            return ;
 					}
+				regx = new Regex(DM_REBOOT_TOPIC_REGX, RegexOptions.IgnoreCase);
+				match = regx.Match(e.Topic);
+				if(match.Success){
+					var res = serializer.Deserialize<DMResponse>(result);
+					if(match.Groups[2].Value == this.gatewayDeviceType && match.Groups[4].Value == this.gatewayDeviceID) {
+						log.Info("Gateway Reboot action called with ReqId : " +res.reqId );
+						if(this.actionCallback != null)
+							this.actionCallback(res.reqId , "reboot");
+					}else{
+						log.Info("Gateway connected device Reboot action called with ReqId : " +res.reqId );
+						if(this.connectedDeviceActionCallback != null)
+							this.connectedDeviceActionCallback(match.Groups[2].Value,match.Groups[4].Value,res.reqId , "reboot");
+					}
+					return ;
+				}
 				
-				if(e.Topic ==  string.Format(DM_REBOOT_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID) ){
-				 	var res = serializer.Deserialize<DMResponse>(result);
-					log.Info("Device Rebot action called with ReqId : " +res.reqId );
-					if(this.actionCallback != null)
-						this.actionCallback(res.reqId , "reboot");
-					}
 	
-				if(e.Topic ==  string.Format(DM_FACTORY_RESET,this.gatewayDeviceType,this.gatewayDeviceID) ){
-				 	var resetResponse = serializer.Deserialize<DMResponse>(result);
-					log.Info("Device Factory rest action called with ReqId : " +resetResponse.reqId );
-					if(this.actionCallback != null)
-						this.actionCallback(resetResponse.reqId , "reset");
+				regx = new Regex(DM_FACTORY_RESET_REGX, RegexOptions.IgnoreCase);
+				match = regx.Match(e.Topic);
+				if(match.Success){
+					var resetResponse = serializer.Deserialize<DMResponse>(result);
+					if(match.Groups[2].Value == this.gatewayDeviceType && match.Groups[4].Value == this.gatewayDeviceID) {
+						log.Info("Gateway Factory rest action called with ReqId : " +resetResponse.reqId );
+						if(this.actionCallback != null)
+							this.actionCallback(resetResponse.reqId , "reset");
+					}else{
+						log.Info("Gateway connected device Factory rest action called with ReqId : " +resetResponse.reqId );
+						if(this.connectedDeviceActionCallback != null)
+							this.connectedDeviceActionCallback(match.Groups[2].Value,match.Groups[4].Value,resetResponse.reqId , "reset");
 					}
-				if(e.Topic ==  string.Format(DM_UPDATE_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID) ){
-					 fwData = serializer.Deserialize<DeviceActionReq>(result);
-					var fields = fwData.d.fields;
-					for (int i = 0; i < fields.Length; i++) {
-						if(fields[i].field == "mgmt.firmware" ){
-							this.fw = fields[i].value;
-							break;
+					return ;
+				}
+				regx = new Regex(DM_UPDATE_TOPIC_REGX, RegexOptions.IgnoreCase);
+				match = regx.Match(e.Topic);
+				if(match.Success){
+					fwData = serializer.Deserialize<DeviceActionReq>(result);
+					if(match.Groups[2].Value == this.gatewayDeviceType && match.Groups[4].Value == this.gatewayDeviceID){
+						var fields = fwData.d.fields;
+						for (int i = 0; i < fields.Length; i++) {
+							if(fields[i].field == "mgmt.firmware" ){
+								this.fw = fields[i].value;
+								break;
+							}
+						}
+						if(this.fw != null)
+						{
+							sendResponse(fwData.reqId,204,"");
+						}
+		
+					}else{
+						if(this.connectedDevicefwActionCallback != null)
+						{
+							this.connectedDevicefwActionCallback(match.Groups[2].Value,match.Groups[4].Value,"info",fwData);
 						}
 					}
-					if(this.fw != null)
-					{
-						sendResponse(fwData.reqId,204,"");
-					}
-	
-					}
-					
-				if(e.Topic ==  string.Format(DM_OBSERVE_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID) ){
-					fwData = serializer.Deserialize<DeviceActionReq>(result);
-					sendResponse(fwData.reqId,200,"");
-					}
-					
-				if(e.Topic ==  string.Format(DM_FIRMWARE_DOWNLOAD_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID) ){
-					fwData = serializer.Deserialize<DeviceActionReq>(result);
-					 rc = RESPONSECODE_ACCEPTED;
-					 msg ="";
-					if(this.fw.state != UPDATESTATE_IDLE){
-						rc = RESPONSECODE_BAD_REQUEST;
-						msg = "Cannot download as the device is not in idle state";							
-					}
-					if(this.fwCallback != null)
-					{
-						this.fwCallback("download",this.fw);
-					}
-					
-					}
-				if(e.Topic ==  string.Format(DM_FIRMWARE_UPDATE_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID) ){
-					fwData = serializer.Deserialize<DeviceActionReq>(result);
-					 rc = RESPONSECODE_ACCEPTED;
-					 msg ="";
-					if(this.fw.state != UPDATESTATE_DOWNLOADED){
-						rc = RESPONSECODE_BAD_REQUEST;
-						msg = "Firmware is still not successfully downloaded.";							
-					}
-					if(this.fwCallback != null)
-					{
-						this.fwCallback("update",this.fw);
-					}
-					
-					}
+					return ;
+				}
 				
-				if(e.Topic ==  string.Format(DM_CANCEL_OBSERVE_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID) ){
+				regx = new Regex(DM_OBSERVE_TOPIC_REGX, RegexOptions.IgnoreCase);
+				match = regx.Match(e.Topic);
+				if(match.Success){
+				//if(e.Topic ==  string.Format(DM_OBSERVE_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID) ){
 					fwData = serializer.Deserialize<DeviceActionReq>(result);
-					sendResponse(fwData.reqId,200,"");
+					sendResponse(fwData.reqId,200,"",match.Groups[2].Value,match.Groups[4].Value);
+				//	}
+				    return ;
+				}
+				regx = new Regex(DM_FIRMWARE_DOWNLOAD_TOPIC_REGX, RegexOptions.IgnoreCase);
+				match = regx.Match(e.Topic);
+				if(match.Success){
+					fwData = serializer.Deserialize<DeviceActionReq>(result);
+					if(match.Groups[2].Value == this.gatewayDeviceType && match.Groups[4].Value == this.gatewayDeviceID){
+						 rc = RESPONSECODE_ACCEPTED;
+						 msg ="";
+						if(this.fw.state != UPDATESTATE_IDLE){
+							rc = RESPONSECODE_BAD_REQUEST;
+							msg = "Cannot download as the device is not in idle state";
+							sendResponse(fwData.reqId,rc,msg);
+							return ;
+						}
+						if(this.fwCallback != null)
+						{
+							this.fwCallback("download",this.fw);
+						}
+					
+					}else{
+						if(this.connectedDevicefwActionCallback != null)
+						{
+							this.connectedDevicefwActionCallback(match.Groups[2].Value,match.Groups[4].Value,"download",fwData);
+						}
 					}
+					return ;
+				}
+				regx = new Regex(DM_FIRMWARE_UPDATE_TOPIC_REGX, RegexOptions.IgnoreCase);
+				match = regx.Match(e.Topic);
+				if(match.Success){
+					fwData = serializer.Deserialize<DeviceActionReq>(result);
+				
+					if(match.Groups[2].Value == this.gatewayDeviceType && match.Groups[4].Value == this.gatewayDeviceID){
+						 rc = RESPONSECODE_ACCEPTED;
+						 msg ="";
+						if(this.fw.state != UPDATESTATE_DOWNLOADED){
+							rc = RESPONSECODE_BAD_REQUEST;
+							msg = "Firmware is still not successfully downloaded.";		
+							sendResponse(fwData.reqId,rc,msg);
+							return ;
+						}
+						if(this.fwCallback != null)
+						{
+							this.fwCallback("update",this.fw);
+						}
+					
+					}else{
+					
+						if(this.connectedDevicefwActionCallback != null)
+						{
+							this.connectedDevicefwActionCallback(match.Groups[2].Value,match.Groups[4].Value,"update",fwData);
+						}
+					}
+					return ;
+				}
+				
+				regx = new Regex(DM_CANCEL_OBSERVE_TOPIC_REGX, RegexOptions.IgnoreCase);
+				match = regx.Match(e.Topic);
+				if(match.Success){
+			
+				//if(e.Topic ==  string.Format(DM_CANCEL_OBSERVE_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID) ){
+					fwData = serializer.Deserialize<DeviceActionReq>(result);
+					sendResponse(fwData.reqId,200,"",match.Groups[2].Value,match.Groups[4].Value);
+				//	}
+					return ;
+				}
 
 				            
 			}
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occer in subscriptionHandler ",ex);
+        		log.Error("Execption has occurred in subscriptionHandler ",ex);
         	}
 
         }
@@ -351,7 +389,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in manage ",e);
+        		throw new Exception("Execption has occurred in manage ",e);
         		return "";
         	}
 		
@@ -383,7 +422,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in managed request ",e);
+        		throw new Exception("Execption has occurred in managed request ",e);
         		return "";
         	}
 			
@@ -402,7 +442,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in unmanaged request ",e);
+        		throw new Exception("Execption has occurred in unmanaged request ",e);
         		return "";
         	}
 		}
@@ -425,7 +466,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addGatewayErrorCode ",e);
+        		throw new Exception ("Execption has occurred in addGatewayErrorCode ",e);
         		return "";
         	}
 		}
@@ -445,7 +487,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearGatewayErrorCode ",e);
+        		throw new Exception ("Execption has occurred in clearGatewayErrorCode ",e);
         		return "";
         	}
 		}
@@ -473,7 +516,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addGatewayLog ",e);
+        		throw new Exception ("Execption has occurred in addGatewayLog ",e);
         		return "";
         	}
 		}
@@ -493,7 +537,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearGatewayLog ",e);
+        		throw new Exception("Execption has occurred in clearGatewayLog ",e);
         		return "";
         	}
 		}
@@ -523,7 +568,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in setGatewayLocation ",e);
+        		throw new Exception("Execption has occurred in setGatewayLocation ",e);
         		return "";
         	}
 		}
@@ -555,7 +601,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in managedDevice ",e);
+        		throw new Exception("Execption has occurred in managedDevice ",e);
         		return "";
         	}
 		
@@ -589,7 +636,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in managedDevice ",e);
+        		throw new Exception ("Execption has occurred in managedDevice ",e);
         		return "";
         	}
 		
@@ -624,7 +672,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in managedDevice ",e);
+        		throw new Exception("Execption has occurred in managedDevice ",e);
         		return "";
         	}
 			
@@ -646,7 +695,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in unmanagedDevice ",e);
+        		throw new Exception("Execption has occurred in unmanagedDevice ",e);
         		return "";
         	}
 		}
@@ -671,7 +721,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addDeviceErrorCode ",e);
+        		throw new Exception("Execption has occurred in addDeviceErrorCode ",e);
         		return "";
         	}
 		}
@@ -693,7 +744,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearDeviceErrorCode ",e);
+        		throw new Exception ("Execption has occurred in clearDeviceErrorCode ",e);
         		return "";
         	}
 		}
@@ -723,7 +775,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addDeviceLog ",e);
+        		throw new Exception("Execption has occurred in addDeviceLog ",e);
         		return "";
         	}
 		}
@@ -745,7 +798,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in manage ",e);
+        		throw new Exception("Execption has occurred in manage ",e);
         		return "";
         	}
 		}
@@ -777,7 +831,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in setDeviceLocation ",e);
+        		throw new Exception("Execption has occurred in setDeviceLocation ",e);
         		return "";
         	}
 		}
@@ -788,10 +843,24 @@ namespace IBMWIoTP
 		/// <param name="rc">Int value of response code </param>
 		/// <param name="msg">String value of response message</param>
 		public void sendResponse ( string reqId, int rc ,string msg){
+			sendResponse(reqId,rc,msg,this.gatewayDeviceType,this.gatewayDeviceID);
+		}
+		
+		/// <summary>
+		/// To send device Action respoce to the Watson IoT Platform
+		/// </summary>
+		/// <param name="reqId">String value of device action request id</param>
+		/// <param name="rc">Int value of response code </param>
+		/// <param name="msg">String value of response message</param>
+		/// <param name="deviceType">String value of device type</param>
+		/// <param name="deviceId">String value of device id</param>
+		public void sendResponse( string reqId, int rc ,string msg,string deviceType,string deviceId){
 			var message = new { reqId =reqId , rc = Convert.ToString(rc) , message = msg};
 			var json = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(message);
-			log.Info("Sending DM response with payload " +json);
-			mqttClient.Publish(string.Format(RESPONSE_TOPIC,this.gatewayDeviceType,this.gatewayDeviceID), Encoding.UTF8.GetBytes(json), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE , false);
+			
+			string topic =string.Format(RESPONSE_TOPIC,deviceType,deviceId);
+			log.Info("Sending DM response with payload " +json +" on Topic "+topic);
+			mqttClient.Publish(topic, Encoding.UTF8.GetBytes(json), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE , false);
 			
 		}
 		/// <summary>
@@ -856,6 +925,17 @@ namespace IBMWIoTP
 		
 		}
 		
+		/// <summary>
+		/// To send responce on Notify topic with the given data
+		/// </summary>
+		/// <param name="deviceType">String value of device type</param>
+		/// <param name="deviceId">String value of device id</param>
+		/// <param name="json">JSON String of the payload</param>
+		public void notify(string deviceType , string deviceId, string json){
+			
+			mqttClient.Publish(string.Format(NOTIFY_TOPIC,deviceType,deviceId), Encoding.UTF8.GetBytes(json), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE , false);
+		}
+		
         public delegate void processMgmtResponse( string reqestId, string responseCode);
 
         public event processMgmtResponse mgmtCallback;
@@ -868,8 +948,13 @@ namespace IBMWIoTP
 
         public event processFirmwareAction fwCallback;
     
-	
+	    public delegate void processConnectedDeviceAction( string deviceType, string deviceId, string reqestId,string action);
+
+        public event processConnectedDeviceAction connectedDeviceActionCallback;
 		
+        public delegate void processConnectedDeviceFwAction( string deviceType, string deviceId,string action,DeviceActionReq req);
+
+        public event processConnectedDeviceFwAction connectedDevicefwActionCallback;
 	}
 	
 }

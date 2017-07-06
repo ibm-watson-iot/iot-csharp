@@ -1,5 +1,5 @@
 ﻿/*
- *  Copyright (c) 2016 IBM Corporation and other Contributors.
+ *  Copyright (c) 2016-2017 IBM Corporation and other Contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,6 +9,7 @@
  * Contributors:
  * 	 kaberi Singh - Initial Contribution
  *   Hari hara prasad Viswanathan  - updations
+ * 	 Nikhil Chennakeshava Murthy and Hari hara prasad Viswanatha - Client certificate based authentication
  */
  
 using System;
@@ -41,11 +42,24 @@ namespace IBMWIoTP
         static string _authmethod ="";
         static string _authtoken ="";
         
+        static string _caCertificatePath = "";
+        static string _caCertificatePassword = "";
+        static string _clientCertificatePath = "";
+        static string _clientCertificatePassword = "";
+        
+        
         public DeviceClient(string orgId, string deviceType, string deviceID, string authmethod, string authtoken)
             : base(orgId, "d" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID, "use-token-auth", authtoken)
         {
 
         }
+        
+        public DeviceClient(string orgId, string deviceType, string deviceID, string authmethod, string authtoken, string caCertificatePath, string caCertificatePassword, string clientCertificatePath, string clientCertificatePassword)
+            : base(orgId, "d" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID, "use-token-auth", authtoken,  caCertificatePath,  caCertificatePassword,  clientCertificatePath,  clientCertificatePassword)
+        {
+
+        }
+        
 
         public DeviceClient(string deviceType, string deviceID)
             : base("quickstart", "d" + CLIENT_ID_DELIMITER + "quickstart" + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID, null, null)
@@ -53,7 +67,7 @@ namespace IBMWIoTP
 
         }
         public DeviceClient(string filePath) :
-        	base(parseFromFile(filePath), "d" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID, "use-token-auth", _authtoken)
+        	base(parseFromFile(filePath), "d" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID, "use-token-auth", _authtoken, _caCertificatePath, _caCertificatePassword, _clientCertificatePath, _clientCertificatePassword)
         	
         {
         	
@@ -66,9 +80,16 @@ namespace IBMWIoTP
         		!data.TryGetValue("Device-Type",out _deviceType)||
         		!data.TryGetValue("Device-ID",out _deviceID)||
         		!data.TryGetValue("Authentication-Method",out _authmethod)||
-        		!data.TryGetValue("Authentication-Token",out _authtoken) )
+        		!data.TryGetValue("Authentication-Token",out _authtoken))
         	{
         		throw new Exception("Invalid property file");
+        	}
+        	if(	!data.TryGetValue("CA-Certificate-Path",out _caCertificatePath)||
+				!data.TryGetValue("CA-Certificate-Password",out _caCertificatePassword)||
+				!data.TryGetValue("Client-Certificate-Path",out _clientCertificatePath)||
+				!data.TryGetValue("Client-Certificate-Password",out _clientCertificatePassword))
+        	{
+        		//log.Info("Certificate's Not found in the given config file");
         	}
         	return _orgId;
         }
@@ -106,7 +127,8 @@ namespace IBMWIoTP
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in Publish Event ",e);
+        		log.Error("Execption has occurred in Publish Event ",e);
+        		throw new Exception("Execption has occurred in Publish Event ",e);
 				return false;
         		
         	}
@@ -150,7 +172,8 @@ namespace IBMWIoTP
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in subscribeCommand ",e);
+        		log.Error("Execption has occurred in subscribeCommand ",e);
+        		throw new Exception("Execption has occurred in subscribeCommand ",e);
         	}
             
         }
@@ -170,7 +193,7 @@ namespace IBMWIoTP
             }
             catch (Exception ex)
             {
-                log.Error("Execption has occer in client_EventPublished",ex);
+                log.Error("Execption has occurred in client_EventPublished",ex);
             }
         }
 		[Obsolete]
@@ -199,7 +222,7 @@ namespace IBMWIoTP
             }
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occer in client_MqttMsgPublishReceived ",ex);
+        		log.Error("Execption has occurred in client_MqttMsgPublishReceived ",ex);
         	}
         }
 

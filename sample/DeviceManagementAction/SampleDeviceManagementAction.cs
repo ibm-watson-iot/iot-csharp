@@ -13,12 +13,14 @@ using System;
 using IBMWIoTP;
 using System.Threading;
 
-namespace GatewayMgmtAction
+namespace DeviceManagementAction
 {
-	class Program
+	class SampleDeviceManagementAction
 	{
 		public static void Main(string[] args)
 		{
+        	Console.WriteLine("============================ IBM WatsonIoTP Sample ============================");
+			
 			string orgID = "";
 			string deviceType = "";
 			string deviceId = "";
@@ -40,7 +42,6 @@ namespace GatewayMgmtAction
         	Console.Write("Enter your auth key :");
         	authKey = Console.ReadLine();
 			
-
 			
 			DeviceInfo simpleDeviceInfo = new DeviceInfo();
 		    simpleDeviceInfo.description = "My device";
@@ -52,54 +53,58 @@ namespace GatewayMgmtAction
 		    simpleDeviceInfo.serialNumber = "12345";
 		    simpleDeviceInfo.descriptiveLocation ="My device location";
 		    
-		    GatewayManagement	gwMgmtClient = new GatewayManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
-			gwMgmtClient.deviceInfo = simpleDeviceInfo;
-			gwMgmtClient.mgmtCallback += processMgmtResponse;
-			gwMgmtClient.actionCallback += (string reqestId,string action)=>{
+		    DeviceManagement	deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
+			deviceClient.deviceInfo = simpleDeviceInfo;
+			deviceClient.mgmtCallback += processMgmtResponse;
+			deviceClient.actionCallback += (string reqestId,string action)=>{
 				Console.WriteLine("req Id:" + reqestId +"	Action:"+ action +" called");
 				if(action == "reboot"){
-					gwMgmtClient.sendResponse(reqestId,DeviceManagement.RESPONSECODE_ACCEPTED,"");
+					deviceClient.sendResponse(reqestId,DeviceManagement.RESPONSECODE_ACCEPTED,"");
 
 					Thread.Sleep(2000);
-					gwMgmtClient.disconnect();
+					deviceClient.disconnect();
 					
 					Console.WriteLine("disconnected");
 					Thread.Sleep(5000);
 					
 					Console.WriteLine("Re connected");	
-					gwMgmtClient.connect();
+					deviceClient.connect();
 					
-					gwMgmtClient.managedGateway(4000,true,true);
+					deviceClient.manage(4000,true,true);
 				}
 				if(action == "reset"){
-					gwMgmtClient.sendResponse(reqestId,DeviceManagement.RESPONSECODE_FUNCTION_NOT_SUPPORTED,"");
+					deviceClient.sendResponse(reqestId,DeviceManagement.RESPONSECODE_FUNCTION_NOT_SUPPORTED,"");
 				}
 		
 			};
-			gwMgmtClient.fwCallback += (string action , DeviceFirmware fw)=>{
+			deviceClient.fwCallback += (string action , DeviceFirmware fw)=>{
 				if(action == "download"){
-					gwMgmtClient.setState(DeviceManagement.UPDATESTATE_DOWNLOADING);
-					Console.WriteLine("Start downloading new Firmware form "+fw.uri);
+					deviceClient.setState(DeviceManagement.UPDATESTATE_DOWNLOADING);
+					Console.WriteLine("Start downloading new Firmware from "+fw.uri);
 					Thread.Sleep(2000);
 					Console.WriteLine("completed Download");
-					gwMgmtClient.setState(DeviceManagement.UPDATESTATE_DOWNLOADED);
+					deviceClient.setState(DeviceManagement.UPDATESTATE_DOWNLOADED);
 				
 				}
 				if(action == "update"){
-					gwMgmtClient.setUpdateState(DeviceManagement.UPDATESTATE_IN_PROGRESS);
-					Console.WriteLine("Start Updateting new Firmware ");
+					deviceClient.setUpdateState(DeviceManagement.UPDATESTATE_IN_PROGRESS);
+					Console.WriteLine("Start Updating new Firmware ");
 					Thread.Sleep(2000);
 					Console.WriteLine("Updated new Firmware ");
-					gwMgmtClient.setUpdateState(DeviceManagement.UPDATESTATE_SUCCESS);
+					deviceClient.setUpdateState(DeviceManagement.UPDATESTATE_SUCCESS);
 				}
 			};
-			gwMgmtClient.connect();
+			deviceClient.connect();
+			deviceClient.subscribeCommand("testcmd", "json", 2);
+           	deviceClient.commandCallback += processCommand;
 			Console.WriteLine("Manage");
-			gwMgmtClient.managedGateway(4000,true,true);
-		
+			deviceClient.manage(4000,true,true);
+			Console.WriteLine("Set Location");
+			deviceClient.setLocation(77.5667,12.9667, 0,10);
+
 			//Console.Write("Press any key to exit . . . ");
 			Console.ReadKey();
-//			gwMgmtClient.disconnect();
+//			deviceClient.disconnect();
 			
 			
 		}
@@ -107,7 +112,8 @@ namespace GatewayMgmtAction
 			Console.WriteLine("req Id:" + reqestId +"	responseCode:"+ responseCode);
 		}
 		
-        
+        public static void processCommand(string cmdName, string format, string data) {
+             Console.WriteLine("Sample Device Client : Sample Command " + cmdName + " " + "format: " + format + "data: " + data);
+        }
 	}
-	
 }

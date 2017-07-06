@@ -22,6 +22,7 @@ namespace com.ibm.iotf.client.app.sample
 
         static void Main(string[] args)
         {
+        	Console.WriteLine("============================ IBM WatsonIoTP Sample ============================");
             try
             {
                 string data = "{\"name\":\"foo\",\"cpu\":60,\"mem\":50}";
@@ -42,7 +43,7 @@ namespace com.ibm.iotf.client.app.sample
 				Console.Write("Enter your auth token :");
 				authToken = Console.ReadLine();
 				
-				Console.Write("Please enter device details to which you want to subscribe event and send command...");
+				Console.WriteLine("Please enter device details to which you want to subscribe event and send command...");
 				
                 Console.Write("Enter your device type :");
 				deviceType = Console.ReadLine();
@@ -72,6 +73,8 @@ namespace com.ibm.iotf.client.app.sample
                 
 			
                 applicationClient.publishCommand(deviceType, deviceId, "testcmd", "json", data, 0);
+                
+                Console.ReadKey();
 
                 applicationClient.disconnect();
             }

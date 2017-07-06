@@ -1,5 +1,5 @@
 ﻿/*
- *  Copyright (c) 2016 IBM Corporation and other Contributors.
+ *  Copyright (c) 2016-2017 IBM Corporation and other Contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Hari hara prasad Viswanathan  - Initial Contribution
+ * 
  */
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace test
 	public class DeviceClient 
 	{
 		IBMWIoTP.DeviceClient testClient;
-		string orgId,deviceType,deviceID,authmethod,authtoken;
+		string orgId,deviceType,deviceID,authmethod,authtoken,caCertificatePath,caCertificatePassword,clientCertificatePath,clientCertificatePassword;
 		
 		[SetUp]
 		public void Setup() 
@@ -57,6 +58,24 @@ namespace test
 	    		throw new Exception("Invalid property file");
 	    	}
 			 testClient  = new IBMWIoTP.DeviceClient(orgId,deviceType,deviceID,authmethod,authtoken);
+		}
+		[Test]
+		public void DeviceClientObjectCreationWithValuesWithCA()
+		{
+			Dictionary<string,string> data = IBMWIoTP.DeviceClient.parseFile("../../Resource/prop.txt","## Device Registration detail");
+	    	if(	!data.TryGetValue("Organization-ID",out orgId)||
+	    		!data.TryGetValue("Device-Type",out deviceType)||
+	    		!data.TryGetValue("Device-ID",out deviceID)||
+	    		!data.TryGetValue("Authentication-Method",out authmethod)||
+	    		!data.TryGetValue("Authentication-Token",out authtoken) ||
+	    		!data.TryGetValue("CA-Certificate-Path",out caCertificatePath)||
+				!data.TryGetValue("CA-Certificate-Password",out caCertificatePassword)||
+				!data.TryGetValue("Client-Certificate-Path",out clientCertificatePath)||
+				!data.TryGetValue("Client-Certificate-Password",out clientCertificatePassword))
+        	{
+        		throw new Exception("Invalid property file");
+        	}
+			 testClient  = new IBMWIoTP.DeviceClient(orgId,deviceType,deviceID,authmethod,authtoken,caCertificatePath,caCertificatePassword,clientCertificatePath,clientCertificatePassword);
 		}
 		[Test]
 		public void DeviceClientObjectCreationWithFilePath()

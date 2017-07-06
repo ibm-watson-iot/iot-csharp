@@ -61,8 +61,8 @@ To subscribe to a specific event from two or more different devices
 
 .. code:: C#
 
-    applicationClient.connect();
-   applicationClient.subscribeToDeviceEvents(deviceType, deviceId, evtName);
+        applicationClient.connect();
+        applicationClient.subscribeToDeviceEvents(deviceType, deviceId, evtName);
 
 
 To subscribe to all events published by a device in json format
@@ -79,15 +79,15 @@ Handling events from devices
 
 To process the events received by your subscriptions you need to register an event callback method.
 
-- ``device Type `` - string (identifies the device type across all types of devices in the organization)
-- ``device Id `` - string (uniquely identifies the device across all devices of the above type in the organization)
+- ``deviceType`` - string (identifies the device type across all types of devices in the organization)
+- ``deviceId`` - string (uniquely identifies the device across all devices of the above type in the organization)
 - ``eventName`` - string
 - ``eventFormat`` - string
 - ``eventData`` - string
 
 .. code:: C#
 
-    public static void processEvent(string deviceType,string deviceId ,String eventName, string format, string data) {
+    public static void processEvent(string deviceType,string deviceId ,string eventName, string format, string data) {
         // Do something
     }
 
@@ -110,7 +110,7 @@ Subscribe to status updates for all devices
 .. code:: C#
 
    applicationClient.connect();
-   applicationClient.deviceStatusCallback += processDeviceStatus;
+   applicationClient.deviceStatusCallback  += processDeviceStatus;
    applicationClient.subscribeToDeviceStatus();
 
 
@@ -120,7 +120,7 @@ Subscribe to status updates for two different devices
 .. code:: C#
 
     applicationClient.connect();
-    applicationClient.subscribeToDeviceStatus += processDeviceStatus;
+    applicationClient.deviceStatusCallback += processDeviceStatus;
     applicationClient.subscribeToDeviceStatus(deviceType, deviceId);
 
 
@@ -130,16 +130,16 @@ To process the status updates received by your subscriptions you need to registe
 
 .. code:: C#
 
-    public static void processDeviceStatus(String deviceType, string deviceId, string data)
-        {
-           //
-        }
+       public static void processDeviceStatus(string deviceType, string deviceId, string data)
+       {
+
+       }
 
 
-    applicationClient.connect();
+       applicationClient.connect();
 
-    applicationClient.appStatusCallback += processAppStatus;
-    applicationClient.subscribeToApplicationStatus();
+       applicationClient.appStatusCallback += processAppStatus;
+       applicationClient.subscribeToApplicationStatus();
 
 
 ----

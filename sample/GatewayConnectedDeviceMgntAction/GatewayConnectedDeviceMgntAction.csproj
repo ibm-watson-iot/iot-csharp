@@ -1,15 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <PropertyGroup>
-    <ProjectGuid>{7A9050F6-8500-439C-9A21-B27583DA9FCC}</ProjectGuid>
+    <ProjectGuid>{6F323813-9137-4745-B798-6DD57C181036}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Gateway</RootNamespace>
-    <AssemblyName>Gateway</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <RootNamespace>GatewayConnectedDeviceMgntAction</RootNamespace>
+    <AssemblyName>GatewayConnectedDeviceMgntAction</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <AppDesignerFolder>Properties</AppDesignerFolder>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
@@ -40,23 +39,35 @@
     <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.Extensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SampleGateway.cs" />
+    <Compile Include="ConectedDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
+    <Compile Include="SampleGatewayConnectedDeviceManagementAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\IBMWIoTP\IBMWIoTP.csproj">
       <Project>{A41D9542-C3DF-422C-8293-457EEE710A90}</Project>
       <Name>IBMWIoTP</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AppCreds.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="GatewayCreds.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

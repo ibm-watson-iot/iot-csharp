@@ -242,5 +242,58 @@ namespace test
 			Assert.AreEqual("value",sample.value);
 			
 		}
+		[Test]
+		public void DMRequestObjectTest(){
+		
+			DMRequest sample = new DMRequest();
+			sample.json = "{}";
+			sample.reqID = "id";
+			sample.topic = "topic";
+			
+			Assert.AreEqual("{}",sample.json );
+			Assert.AreEqual("id",sample.reqID );
+			Assert.AreEqual("topic",sample.topic );
+		}
+		[Test]
+		public void DMResponseObjectTest(){
+		
+			DMResponse sample = new DMResponse();
+			sample.rc = "1";
+			sample.reqId = "id";
+			
+			Assert.AreEqual("1",sample.rc);
+			Assert.AreEqual("id",sample.reqId);
+			
+		}
+		[Test]
+		public void DMFieldObjectTest(){
+		
+			DMField sample = new DMField();
+			sample.value = new DeviceFirmware();
+			sample.value.version = "1.1.1";
+			sample.field = "field";
+			
+			Assert.AreEqual("field",sample.field);
+			Assert.AreEqual("1.1.1",sample.value.version);
+		}
+		[Test]
+		public void DMFieldsObjectTest(){
+		
+			DMFields sample = new DMFields();
+			sample.fields = new DMField[1];
+			
+			Assert.AreEqual(1,sample.fields.Length);
+		}
+		[Test]
+		public void DeviceActionReqObjectTest(){
+		
+			DeviceActionReq sample = new DeviceActionReq();
+			sample.reqId = "id";
+			sample.d = new DMFields();
+			sample.d.fields = new DMField[1];
+			
+			Assert.AreEqual(1,sample.d.fields.Length);
+			Assert.AreEqual("id",sample.reqId);
+		}
 	}
 }

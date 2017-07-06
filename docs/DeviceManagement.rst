@@ -26,7 +26,6 @@ The `device management <https://docs.internetofthings.ibmcloud.com/devices/devic
 * **Unmanaged Devices** are any devices which do not have a device management agent. All devices begin their life-cycle as unmanaged devices, and can transition to managed devices by sending a message from a device management agent to the IBM Watson IoT Platform Connect.
 
 
----------------------------------------------------------------------------
 Connecting to the IBM Watson IoT Platform Connect Device Management Service
 ---------------------------------------------------------------------------
 
@@ -49,7 +48,7 @@ The following code snippet shows how to create the mandatory object DeviceInfo a
   simpleDeviceInfo.model = "My device model";
   simpleDeviceInfo.serialNumber = "<your device id>5";
 
-  DeviceManagement	deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
+  DeviceManagement deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
   deviceClient.deviceInfo = simpleDeviceInfo;
   deviceClient.connect();
 
@@ -61,13 +60,13 @@ DeviceManagement exposes the following constructor to support different user pat
 
 Constructs a DeviceManagement instance by accepting the following parameters,
 
-* org - Your organization ID.
-* type - The type of your device.
-* id - The ID of your device.
-* auth-method - Method of authentication (The only value currently supported is "token").
-* auth-token - Auth Token
+* ``org`` - Your organization ID.
+* ``type`` - The type of your device.
+* ``id`` - The ID of your device.
+* ``auth-method`` - Method of authentication (The only value currently supported is "token").
+* ``auth-token`` - Auth Token
 
-And isSync as optional parameters which in case of true all managed request will be performed synchronously.
+And ``isSync`` as optional parameters which in case of true all managed request will be performed synchronously.
 
 All these properties are required to interact with the IBM Watson IoT Platform Connect.
 
@@ -75,14 +74,14 @@ The following code shows how to create a DeviceManagement instance:
 
 .. code:: C#
 
-  string orgID = "<your org id>";
-  string deviceType = "<your device type>";
-  string deviceId = "<your gateway auth token>";
-  string authType = "token";
-  string authKey = "<your auth key >";
-  bool isSync = true;
+	string orgID = "<your org id>";
+	string deviceType = "<your device type>";
+	string deviceId = "<your gateway auth token>";
+	string authType = "token";
+	string authKey = "<your auth key >";
+	bool isSync = true;
 
-  DeviceManagement	deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
+	DeviceManagement deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
 	deviceClient.deviceInfo = simpleDeviceInfo;
 	deviceClient.connect();
 
@@ -105,18 +104,18 @@ The following code shows how to create a callback instance:
 
 .. code:: C#
 
-    DeviceManagement	deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
-    deviceClient.deviceInfo = simpleDeviceInfo;
-    deviceClient.mgmtCallback += processMgmtResponce;
-    deviceClient.connect();
+	DeviceManagement deviceClient = new DeviceManagement(orgID,deviceType,deviceId,authType,authKey,isSync);
+	deviceClient.deviceInfo = simpleDeviceInfo;
+	deviceClient.mgmtCallback += processMgmtResponce;
+	deviceClient.connect();
 
-    .........
-    .........
-    .........
+	.........
+	.........
+	.........
 
-    public static void processMgmtResponce( string reqestId, string responceCode){
-    		Console.WriteLine("req Id:" + reqestId +"	responceCode:"+ responceCode);
-    	}
+	public static void processMgmtResponce( string reqestId, string responceCode){
+		Console.WriteLine("req Id:" + reqestId +"responceCode:"+ responceCode);
+	}
 
 
 Manage
@@ -196,3 +195,194 @@ Also, the log messages can be cleared from Internet of Things Platform Connect b
 The device diagnostics operations are intended to provide information on device errors, and does not provide diagnostic information relating to the devices connection to the Internet of Things Platform Connect.
 
 Refer to the `documentation <https://docs.internetofthings.ibmcloud.com/devices/device_mgmt/index.html#/add-log#add-log>`__ for more information about the log operations.
+
+
+----
+
+Firmware Actions
+-------------------------------------------------------------
+The firmware update process is separated into two distinct actions:
+
+* Downloading Firmware
+* Updating Firmware.
+
+The device needs to do the following activities to support Firmware Actions:
+
+**1. Inform the server about the Firmware action support**
+
+The device needs to set the firmware action flag to true in order for the server to initiate the firmware request. This can be achieved by invoking the manage() method with a true value for supportFirmwareActions parameter,
+
+.. code:: C#
+
+    deviceClient.manage(4000,false,true);
+
+Once the support is informed to the DM server, the server then forwards the firmware actions to the device.
+
+**2. Create the Firmware Action Handler**
+
+In order to support the Firmware action, the device needs to create a handler and add it to ManagedDevice.
+
+.. code:: C#
+
+  public delegate void processFirmwareAction(string action,DeviceFirmware firmware){
+  ...
+  };
+
+**3.1 Sample implementation of downloadFirmware**
+
+The implementation must create a separate thread and add a logic to download the firmware and report the status of the download via DeviceManagement object. If the Firmware Download operation is successful, then the state of the firmware to be set to DOWNLOADED and UpdateStatus should be set to SUCCESS.
+
+If an error occurs during Firmware Download the state should be set to IDLE and updateStatus should be set to one of the error status values:
+
+* UPDATESTATE_OUT_OF_MEMORY
+* UPDATESTATE_CONNECTION_LOST
+* UPDATESTATE_INVALID_URI
+* UPDATESTATE_VERIFICATION_FAILED
+
+A sample Firmware Download implementation is shown below:
+
+.. code:: C#
+
+  public  void processFirmwareAction (string action , DeviceFirmware fw){
+        if(action == "download"){
+          deviceClient.setState(DeviceManagement.UPDATESTATE_DOWNLOADING);
+          Console.WriteLine("Start downloading new Firmware form "+fw.uri);
+          //perform your firmware download
+          Thread.Sleep(2000);
+          Console.WriteLine("completed Download");
+          deviceClient.setState(DeviceManagement.UPDATESTATE_DOWNLOADED);
+
+        }
+        if(action == "update"){
+          deviceClient.setUpdateState(DeviceManagement.UPDATESTATE_IN_PROGRESS);
+          Console.WriteLine("Start Updateting new Firmware ");
+          //perform your firmware download
+          Thread.Sleep(2000);
+          Console.WriteLine("Updated new Firmware ");
+          deviceClient.setUpdateState(DeviceManagement.UPDATESTATE_SUCCESS);
+        }
+      };
+
+Device can check the integrity of the downloaded firmware image using the verifier and report the status back to IBM Watson Internet of Things Platform. The verifier can be set by the device during the startup (while creating the DeviceManagement object) or as part of the Download Firmware request by the application.
+
+The complete code can be found in the device management sample `DeviceManagement samples <https://github.com/ibm-watson-iot/iot-csharp/tree/master/sample/DeviceManagement>`__.
+
+**3.2 Sample implementation of updateFirmware**
+
+The implementation must create a separate thread and add a logic to install the downloaded firmware and report the status of the update via DeviceManagement object. If the Firmware Update operation is successful, then the state of the firmware should to be set to IDLE and UpdateStatus should be set to SUCCESS.
+
+If an error occurs during Firmware Update, updateStatus should be set to one of the error status values:
+
+* UPDATESTATE_OUT_OF_MEMORY
+* UPDATESTATE_UNSUPPORTED_IMAGE
+
+A sample Firmware Update implementation is shown below:
+
+.. code:: C#
+
+  public void processFirmwareAction (string action , DeviceFirmware fw){
+      if(action == "download"){
+        deviceClient.setState(DeviceManagement.UPDATESTATE_DOWNLOADING);
+        Console.WriteLine("Start downloading new Firmware form "+fw.uri);
+        //perform your firmware download
+        Thread.Sleep(2000);
+        Console.WriteLine("completed Download");
+        deviceClient.setState(DeviceManagement.UPDATESTATE_DOWNLOADED);
+
+      }
+      if(action == "update"){
+        deviceClient.setUpdateState(DeviceManagement.UPDATESTATE_IN_PROGRESS);
+        Console.WriteLine("Start Updateting new Firmware ");
+        //perform your firmware download
+        Thread.Sleep(2000);
+        Console.WriteLine("Updated new Firmware ");
+        deviceClient.setUpdateState(DeviceManagement.UPDATESTATE_SUCCESS);
+      }
+    };
+
+
+The complete code can be found in the device management sample `DeviceManagement samples <https://github.com/ibm-watson-iot/iot-csharp/tree/master/sample/DeviceManagement>`__.
+
+**4. Add the handler to ManagedDevice**
+
+The created handler needs to be added to the ManagedDevice instance so that the WIoTP client library invokes the corresponding method when there is a Firmware action request from IBM Watson Internet of Things Platform.
+
+.. code:: C#
+
+	deviceClient.fwCallback +=processFirmwareAction
+
+Refer to `this page <https://docs.internetofthings.ibmcloud.com/devices/device_mgmt/requests.html#/firmware-actions#firmware-actions>`__ for more information about the Firmware action.
+
+----
+
+Device Actions
+------------------------------------
+The IBM Watson Internet of Things Platform supports the following device actions:
+
+* Reboot
+* Factory Reset
+
+The device needs to do the following activities to support Device Actions:
+
+**1. Inform server about the Device Actions support**
+
+In order to perform Reboot and Factory Reset, the device needs to inform the IBM Watson Internet of Things Platform about its support first. This can be achieved by invoking the sendManageRequest() method with a true value for supportDeviceActions parameter,
+
+.. code:: C#
+	// Second parameter represents the device action support
+  deviceClient.manage(4000,true,false);
+
+Once the support is informed to the DM server, the server then forwards the device action requests to the device.
+
+**2. Create the Device Action Handler**
+
+In order to support the device action, the device needs to create a handler and add it to ManagedDevice.
+
+.. code:: C#
+
+  public void processDeviceAction( string reqestId,string action){
+
+  }
+
+**2 Sample implementation of handles**
+
+The implementation must create a separate thread and add a logic to reboot or reset the device and report the status of the reboot via deviceClient object. Upon receiving the request, the device first needs to inform the server about the support(or failure) before proceeding with the actual reboot or reset . And if the device can not reboot the device or any other error during the reboot or reset, the device can update the status along with an optional message. A sample reboot implementation of a device is shown below:
+
+.. code:: C#
+
+  public void processDeviceAction( string reqestId,string action){
+
+      Console.WriteLine("req Id:" + reqestId +"	Action:"+ action +" called");
+      if(action == "reboot"){
+      deviceClient.sendResponse(reqestId,DeviceManagement.RESPONSECODE_ACCEPTED,"");
+
+      Thread.Sleep(2000);
+      deviceClient.disconnect();
+
+      Console.WriteLine("disconnected");
+      Thread.Sleep(5000);
+
+      Console.WriteLine("Re connected");
+      deviceClient.connect();
+
+      deviceClient.manage(4000,true,true);
+      }
+      if(action == "reset"){
+      deviceClient.sendResponse(reqestId,DeviceManagement.RESPONSECODE_FUNCTION_NOT_SUPPORTED,"");
+      }
+  }
+
+
+The complete code can be found in the device management sample `DeviceManagement samples <https://github.com/ibm-watson-iot/iot-csharp/tree/master/sample/DeviceManagement>`__.
+
+**3. Add the handler to ManagedDevice**
+
+The created handler needs to be added to the ManagedDevice instance so that the WIoTP client library invokes the corresponding method when there is a device action request from IBM Watson Internet of Things Platform.
+
+.. code:: C#
+
+	deviceClient.actionCallback += processDeviceAction;
+
+Refer to `this page <https://docs.internetofthings.ibmcloud.com/devices/device_mgmt/requests.html#/device-actions-reboot#device-actions-reboot>`__ for more information about the Device Action.
+
+----
