@@ -147,7 +147,6 @@ namespace IBMWIoTP
 		/// <param name="qos"> int value of the quality of services 0,1,2</param>
 		public void subscribeToDeviceCommands(string deviceType, string deviceId, string command, int qos) {
 			try {
-				mqttClient.MqttMsgPublishReceived -= client_MqttMsgPublishReceived;
 				mqttClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
 				string newTopic = "iot-2/type/"+deviceType+"/id/"+deviceId+"/cmd/" + command + "/fmt/json";
 				string[] topics = { newTopic };
@@ -155,7 +154,8 @@ namespace IBMWIoTP
 		        mqttClient.Subscribe(topics, qosLevels);
 		        
 			} catch (Exception e) {
-                log.Error("Execption has occer in subscribeToDeviceCommands",e);
+                log.Error("Execption has occurred in subscribeToDeviceCommands",e);
+                throw new Exception("Execption has occurred in subscribeToDeviceCommands",e);
 			}
 		}
 		/// <summary>
@@ -171,7 +171,6 @@ namespace IBMWIoTP
 		/// To subscribe to notifications from the platform to the gateway 
 		/// </summary>
 		public void subscribeToGatewayNotification() {
-			mqttClient.MqttMsgPublishReceived -= client_MqttMsgPublishReceived;
 			mqttClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
 			
 			string newTopic = "iot-2/type/"+this.gatewayDeviceType +"/id/" +this.gatewayDeviceID + "/notify";
@@ -255,7 +254,7 @@ namespace IBMWIoTP
             }
             catch (Exception ex)
             {
-                log.Error("Execption has occer in client_EventPublished",ex);
+                log.Error("Execption has occurred in client_EventPublished",ex);
             }
         }
 		[Obsolete]
@@ -306,7 +305,8 @@ namespace IBMWIoTP
             }
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occer in client_MqttMsgPublishReceived ",ex);
+        		log.Error("Execption has occurred in client_MqttMsgPublishReceived ",ex);
+        		throw new Exception("Execption has occurred in client_MqttMsgPublishReceived ",ex);
         	}
         }
 

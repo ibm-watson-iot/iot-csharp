@@ -12,12 +12,14 @@
 using System;
 using IBMWIoTP;
 
-namespace deviceManagement
+namespace DeviceManagementSample
 {
-	class Program
+	class SampleDeviceManagement
 	{
 		public static void Main(string[] args)
 		{
+        	Console.WriteLine("============================ IBM WatsonIoTP Sample ============================");
+			
 			string orgID = "";
 			string deviceType = "";
 			string deviceId = "";

@@ -341,7 +341,7 @@ namespace IBMWIoTP
 			}
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occer in subscriptionHandler ",ex);
+        		log.Error("Execption has occurred in subscriptionHandler ",ex);
         	}
 
         }
@@ -389,7 +389,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in manage ",e);
+        		throw new Exception("Execption has occurred in manage ",e);
         		return "";
         	}
 		
@@ -421,7 +422,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in managed request ",e);
+        		throw new Exception("Execption has occurred in managed request ",e);
         		return "";
         	}
 			
@@ -440,7 +442,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in unmanaged request ",e);
+        		throw new Exception("Execption has occurred in unmanaged request ",e);
         		return "";
         	}
 		}
@@ -463,7 +466,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addGatewayErrorCode ",e);
+        		throw new Exception ("Execption has occurred in addGatewayErrorCode ",e);
         		return "";
         	}
 		}
@@ -483,7 +487,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearGatewayErrorCode ",e);
+        		throw new Exception ("Execption has occurred in clearGatewayErrorCode ",e);
         		return "";
         	}
 		}
@@ -511,7 +516,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addGatewayLog ",e);
+        		throw new Exception ("Execption has occurred in addGatewayLog ",e);
         		return "";
         	}
 		}
@@ -531,7 +537,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearGatewayLog ",e);
+        		throw new Exception("Execption has occurred in clearGatewayLog ",e);
         		return "";
         	}
 		}
@@ -561,7 +568,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in setGatewayLocation ",e);
+        		throw new Exception("Execption has occurred in setGatewayLocation ",e);
         		return "";
         	}
 		}
@@ -593,7 +601,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in managedDevice ",e);
+        		throw new Exception("Execption has occurred in managedDevice ",e);
         		return "";
         	}
 		
@@ -627,7 +636,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in managedDevice ",e);
+        		throw new Exception ("Execption has occurred in managedDevice ",e);
         		return "";
         	}
 		
@@ -662,7 +672,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in managedDevice ",e);
+        		throw new Exception("Execption has occurred in managedDevice ",e);
         		return "";
         	}
 			
@@ -684,7 +695,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in unmanagedDevice ",e);
+        		throw new Exception("Execption has occurred in unmanagedDevice ",e);
         		return "";
         	}
 		}
@@ -709,7 +721,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addDeviceErrorCode ",e);
+        		throw new Exception("Execption has occurred in addDeviceErrorCode ",e);
         		return "";
         	}
 		}
@@ -731,7 +744,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearDeviceErrorCode ",e);
+        		throw new Exception ("Execption has occurred in clearDeviceErrorCode ",e);
         		return "";
         	}
 		}
@@ -761,7 +775,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addDeviceLog ",e);
+        		throw new Exception("Execption has occurred in addDeviceLog ",e);
         		return "";
         	}
 		}
@@ -783,7 +798,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in manage ",e);
+        		throw new Exception("Execption has occurred in manage ",e);
         		return "";
         	}
 		}
@@ -815,7 +831,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in setDeviceLocation ",e);
+        		throw new Exception("Execption has occurred in setDeviceLocation ",e);
         		return "";
         	}
 		}

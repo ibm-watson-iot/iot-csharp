@@ -14,10 +14,12 @@ using IBMWIoTP;
 
 namespace Gateway
 {
-	class Program
+	class SampleGateway
 	{
 		public static void Main(string[] args)
 		{
+        	Console.WriteLine("============================ IBM WatsonIoTP Sample ============================");
+			
 			Console.WriteLine("Example for gateway");
 			string orgId ="";
 			string gatewayDeviceType = "";

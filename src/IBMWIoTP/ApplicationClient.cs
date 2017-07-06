@@ -151,7 +151,8 @@ namespace IBMWIoTP
 	         }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in subscribeToDeviceStatus ",e);
+        		log.Error("Execption has occurred in subscribeToDeviceStatus ",e);
+        		throw new Exception("Execption has occurred in subscribeToDeviceStatus ",e);
         	}
         }
 
@@ -187,7 +188,8 @@ namespace IBMWIoTP
              }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in subscribeToDeviceStatus ",e);
+        		log.Error("Execption has occurred in subscribeToDeviceStatus ",e);
+        		throw new Exception("Execption has occurred in subscribeToDeviceStatus ",e);
         	}
         }
 
@@ -209,7 +211,8 @@ namespace IBMWIoTP
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in subscribeToApplicationStatus ",e);
+        		log.Error("Execption has occurred in subscribeToApplicationStatus ",e);
+        		throw new Exception("Execption has occurred in subscribeToApplicationStatus ",e);
         	}
         }
         /// <summary>
@@ -264,7 +267,8 @@ namespace IBMWIoTP
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in subscribeToDeviceEvents ",e);
+        		log.Error("Execption has occurred in subscribeToDeviceEvents ",e);
+        		throw new Exception("Execption has occurred in subscribeToDeviceEvents ",e);
         	}
         }
 
@@ -295,12 +299,13 @@ namespace IBMWIoTP
 	        }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in subscribeToDeviceEvents ",e);
+        		log.Error("Execption has occurred in subscribeToDeviceEvents ",e);
+        		throw new Exception("Execption has occurred in subscribeToDeviceEvents ",e);
         	}    
         }
 
         /// <summary>
-        ///     Message subscription when subscribed event occurs or subscribed command executes <br>
+        ///     Message subscription when subscribed event occurreds or subscribed command executes <br>
         /// </summary>
         void client_MqttMsgSubscribed(object sender, MqttMsgSubscribedEventArgs e)
         {
@@ -308,7 +313,7 @@ namespace IBMWIoTP
         }
 
         /// <summary>
-        ///     Message publish when subscribed event occurs or subscribed command executes <br>
+        ///     Message publish when subscribed event occurreds or subscribed command executes <br>
         /// </summary>
         void client_MqttMsgPublished(object sender, MqttMsgPublishedEventArgs e)
         {
@@ -373,7 +378,7 @@ namespace IBMWIoTP
 	        }
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occer in client_MqttMsgArrived ",ex);
+        		log.Error("Execption has occurred in client_MqttMsgArrived ",ex);
         	}
         }
   
@@ -453,7 +458,8 @@ namespace IBMWIoTP
             }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in publishCommand ",e);
+        		log.Error("Execption has occurred in publishCommand ",e);
+        		throw new Exception("Execption has occurred in publishCommand ",e);
         		return false;
         	}
         }
@@ -518,7 +524,8 @@ namespace IBMWIoTP
 	        }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in publishEvent ",e);
+        		log.Error("Execption has occurred in publishEvent ",e);
+        		throw new Exception("Execption has occurred in publishEvent ",e);
         		return false;
         	}
         }

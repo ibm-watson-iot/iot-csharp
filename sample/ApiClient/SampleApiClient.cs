@@ -15,10 +15,12 @@ using System.Web.Script.Serialization;
 
 namespace ApiClient
 {
-	class Program
+	class SampleApiClient
 	{
 		public static void Main(string[] args)
 		{
+        	Console.WriteLine("============================ IBM WatsonIoTP Sample ============================");
+			
 			string apiKey ="";
 			string authToken ="";
 			string managedDeviceType = "demotest";

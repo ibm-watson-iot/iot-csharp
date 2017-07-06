@@ -14,11 +14,13 @@ using IBMWIoTP;
 
 namespace GatewayMgmt
 {
-	class Program
+	class SampleGatewayManagement
 	{
 		public static void Main(string[] args)
 		{
-			Console.WriteLine("Sample Managed GateWay Device");
+        	Console.WriteLine("============================ IBM WatsonIoTP Sample ============================");
+			
+			Console.WriteLine("Sample Managed Gateway Device");
 			
 			string orgId ="";
 			string gatewayDeviceType = "";

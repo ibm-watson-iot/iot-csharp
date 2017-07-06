@@ -45,7 +45,7 @@ namespace IBMWIoTP
         private string clientCertificatePath;
         private string caCertificatePassword;
         private string clientCertificatePassword;
-        
+        private bool _isSecureConnection;
         private ILog log = log4net.LogManager.GetLogger(typeof(DeviceManagement));
         
         protected static readonly String CLIENT_ID_DELIMITER = ":";
@@ -82,10 +82,10 @@ namespace IBMWIoTP
             	}
 	            log.Info("hostname is :" + hostName);
 	            mqttClient = new MqttClient(hostName,MQTTS_PORT,true,cer,new X509Certificate(),MqttSslProtocols.TLSv1_2);
-            
+            	this._isSecureConnection = true;
             } catch (Exception) {
             	log.Warn("hostname is :" + hostName+"  with insecure connection");
-            	
+            	this._isSecureConnection = false;
             	mqttClient = new MqttClient(hostName);
             	//throw;
             }
@@ -138,9 +138,11 @@ namespace IBMWIoTP
 	            	}
 		            log.Info("hostname is :" + hostName);
 		            mqttClient = new MqttClient(hostName,MQTTS_PORT,true,cer,new X509Certificate(),MqttSslProtocols.TLSv1_2);
+            		this._isSecureConnection = true;
 	            
 	            } catch (Exception) {
 	            	log.Warn("hostname is :" + hostName+"  with insecure connection");
+            		this._isSecureConnection = false;
 	            	
 	            	mqttClient = new MqttClient(hostName);
 	            	//throw;
@@ -166,11 +168,12 @@ namespace IBMWIoTP
 	            	
 		            log.Info("hostname is :" + hostName);
 		            mqttClient = new MqttClient(hostName,MQTTS_PORT,true,caCert,clientCert,MqttSslProtocols.TLSv1_2);
-	            
+            		this._isSecureConnection = true;
+	            	
 	            }catch (Exception e) {
 		            log.Info("hostname is :" + hostName+"  with insecure connection");
-		            log.Error("error in constructor, going towards insecure connection" + e.ToString());
-	            	throw;
+		            log.Error("Unable to make secure connection" + e.ToString());
+		            throw(new Exception("Unable to make secure connection" , e));
 	            }
             
             }
@@ -197,7 +200,8 @@ namespace IBMWIoTP
             }
             catch (Exception e)
             {
-            	log.Error("Execption has occer in connecting to MQTT",e);
+            	log.Error("Execption has occurred in connecting to MQTT",e);
+            	throw new Exception("Execption has occurred in connecting to MQTT",e);
             }
         }
 		/// <summary>
@@ -219,7 +223,8 @@ namespace IBMWIoTP
             }
             catch (Exception e)
             {
-            	log.Error("Execption has occer in connecting to MQTT",e);
+            	log.Error("Execption has occurred in connecting to MQTT",e);
+            	throw new Exception ("Execption has occurred in connecting to MQTT",e);
             }
         }
         /// <summary>
@@ -236,7 +241,8 @@ namespace IBMWIoTP
             }
             catch (Exception e)
             {
-            	log.Error("Execption has occer in disconnecting from MQTT",e);
+            	log.Error("Execption has occurred in disconnecting from MQTT",e);
+            	//throw new Exception("Execption has occurred in disconnecting from MQTT",e);
             }
         }
 
@@ -262,6 +268,11 @@ namespace IBMWIoTP
         public string toString()
         {
             return "[" + clientId + "] " +  "Connected = " + isConnected();
+        }
+        public bool isSecureConnection { 
+        	get{
+        		return this._isSecureConnection;
+        	}
         }
 		
         /// <summary>

@@ -264,7 +264,7 @@ namespace IBMWIoTP
 			}
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occer in subscriptionHandler ",ex);
+        		log.Error("Execption has occurred in subscriptionHandler ",ex);
         	}
 
         }
@@ -313,7 +313,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in manage ",e);
+        		throw new Exception("Execption has occurred in manage ",e);
         		return "";
         	}
 		
@@ -345,7 +346,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in manage ",e);
+        		throw new Exception("Execption has occurred in manage ",e);
         		return "";
         	}
 			
@@ -364,7 +366,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in unmanage ",e);
+        		throw new Exception("Execption has occurred in unmanage ",e);
         		return "";
         	}
 		}
@@ -387,7 +390,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addErrorCode ",e);
+        		throw new Exception("Execption has occurred in addErrorCode ",e);
         		return "";
         	}
 		}
@@ -407,7 +411,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearErrorCode ",e);
+        		throw new Exception("Execption has occurred in clearErrorCode ",e);
         		return "";
         	}
 		}
@@ -435,7 +440,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in addLog ",e);
+        		throw new Exception("Execption has occurred in addLog ",e);
         		return "";
         	}
 		}
@@ -455,7 +461,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in clearLog ",e);
+        		throw new Exception("Execption has occurred in clearLog ",e);
         		return "";
         	}
 		}
@@ -484,7 +491,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in manage ",e);
+        		log.Error("Execption has occurred in setLocation ",e);
+        		throw new Exception("Execption has occurred in setLocation ",e);
         		return "";
         	}
 		}

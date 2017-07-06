@@ -19,7 +19,7 @@ using IBMWIoTP;
 
 namespace ClientCA_Authentication
 {
-	public class Program
+	public class SampleClientCAAuthentication
 	{
 		
 		private static DeviceClient deviceClient;
@@ -27,17 +27,18 @@ namespace ClientCA_Authentication
 		
 		public static void Main(string[] args)
 		{
+        	Console.WriteLine("============================ IBM WatsonIoTP Sample ============================");
+			
 			Console.WriteLine("Example for Client certificate authentication for Device and Gateway");
 
 			int opt;
-			Console.Write("1.Device\n2.Gateway\n");
+			Console.Write("1.Device\n2.Gateway\nEnter your choice:");
 			
 			opt = Convert.ToInt32(Console.ReadLine()); 
 			
 			switch(opt){
 				case 1:
 					deviceClient = new DeviceClient("prop.txt");
-        	
         		
 		            try{
 		           	 	deviceClient.connect();
@@ -61,7 +62,6 @@ namespace ClientCA_Authentication
 		          case 2:
 		            gatewayClient = new GatewayClient("gatewayprop.txt");
 				
-				
 					try{
 						
 						gatewayClient.connect();
@@ -69,8 +69,6 @@ namespace ClientCA_Authentication
 						gatewayClient.errorCallback += processError;
 						Console.WriteLine("Gateway connected");
 						Console.WriteLine("publishing gateway events..");
-						
-					
 						
 						gatewayClient.publishGatewayEvent("test","{\"temp\":25}");
 						Thread.Sleep(2000);
@@ -87,9 +85,6 @@ namespace ClientCA_Authentication
 					break;
 					
 			}
-			
-				
-				
 			
         	
 		}

@@ -21,7 +21,7 @@ namespace com.ibm.iotf.client.device.sample
         	Console.WriteLine("1.Quick Start");
         	Console.WriteLine("2.Registered Flow");
         	Console.WriteLine("3.Any key to exit");
-        	Console.Write("Please enter your choise :");
+        	Console.Write("Please enter your choice :");
         	int val = int.Parse(Console.ReadLine());
         	switch(val){
     			case 1: Console.WriteLine ("Starting Quick Start Flow");

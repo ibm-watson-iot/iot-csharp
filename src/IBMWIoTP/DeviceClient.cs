@@ -127,7 +127,8 @@ namespace IBMWIoTP
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in Publish Event ",e);
+        		log.Error("Execption has occurred in Publish Event ",e);
+        		throw new Exception("Execption has occurred in Publish Event ",e);
 				return false;
         		
         	}
@@ -171,7 +172,8 @@ namespace IBMWIoTP
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occer in subscribeCommand ",e);
+        		log.Error("Execption has occurred in subscribeCommand ",e);
+        		throw new Exception("Execption has occurred in subscribeCommand ",e);
         	}
             
         }
@@ -191,7 +193,7 @@ namespace IBMWIoTP
             }
             catch (Exception ex)
             {
-                log.Error("Execption has occer in client_EventPublished",ex);
+                log.Error("Execption has occurred in client_EventPublished",ex);
             }
         }
 		[Obsolete]
@@ -220,7 +222,7 @@ namespace IBMWIoTP
             }
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occer in client_MqttMsgPublishReceived ",ex);
+        		log.Error("Execption has occurred in client_MqttMsgPublishReceived ",ex);
         	}
         }
 
