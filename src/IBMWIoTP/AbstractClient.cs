@@ -14,19 +14,19 @@
  
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using System.Configuration;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-
-using uPLibrary.Networking.M2Mqtt;
-using uPLibrary.Networking.M2Mqtt.Messages;
-using uPLibrary.Networking.M2Mqtt.Exceptions;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 using log4net;
+using uPLibrary.Networking.M2Mqtt;
+using uPLibrary.Networking.M2Mqtt.Exceptions;
+using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace IBMWIoTP
 {
@@ -46,12 +46,20 @@ namespace IBMWIoTP
         private string caCertificatePassword;
         private string clientCertificatePassword;
         private bool _isSecureConnection;
-        private ILog log = log4net.LogManager.GetLogger(typeof(DeviceManagement));
+        private bool isCleanSesson = false;
+        private ushort keepAliveTime = 60;
+        private bool _ismanualDisconnect = false;
+        private ILog log = log4net.LogManager.GetLogger(typeof(AbstractClient));
         
-        protected static readonly String CLIENT_ID_DELIMITER = ":";
-        protected static readonly String DOMAIN = ".messaging.internetofthings.ibmcloud.com";
-        protected static readonly int MQTTS_PORT = 8883;
-        protected MqttClient mqttClient;                                                             
+        protected const String CLIENT_ID_DELIMITER = ":";
+        protected int ReConnectCount = 0;
+        
+        public static string DOMAIN = ".messaging.internetofthings.ibmcloud.com";
+        public static int MQTTS_PORT = 8883;
+        protected MqttClient mqttClient; 
+		private CancellationTokenSource reConnectTask = new CancellationTokenSource();
+        private CancellationToken rcCT ;
+        public static bool AutoReconnect =true;
         
         /// <summary>
         ///     Note that this class does not have a default constructor <br>
@@ -71,27 +79,7 @@ namespace IBMWIoTP
             this.clientUsername = userName;
             this.clientPassword = password;
             this.orgId = orgid;
-            String now = DateTime.Now.ToString(".yyyy.MM.dd-THH.mm.fff");
-
-            string hostName = orgid + DOMAIN;
-
-            try {
-            	X509Certificate cer = new X509Certificate();
-            	if(File.Exists("message.pem")){
-					cer.Import("message.pem");
-            	}
-	            log.Info("hostname is :" + hostName);
-	            mqttClient = new MqttClient(hostName,MQTTS_PORT,true,cer,new X509Certificate(),MqttSslProtocols.TLSv1_2);
-            	this._isSecureConnection = true;
-            } catch (Exception) {
-            	log.Warn("hostname is :" + hostName+"  with insecure connection");
-            	this._isSecureConnection = false;
-            	mqttClient = new MqttClient(hostName);
-            	//throw;
-            }
-			//mqttClient = new MqttClient(hostName);
-
-
+			init ();
         }
         
                 
@@ -112,7 +100,9 @@ namespace IBMWIoTP
         /// <param name="clientCertificatePassword">
         ///     object of String which denotes client certificate password </param>
                 
-        public AbstractClient(string orgid, string clientId, string userName, string password, string caCertificatePath, string caCertificatePassword, string clientCertificatePath, string clientCertificatePassword)
+        public AbstractClient(string orgid, string clientId, string userName,string password,
+                              string caCertificatePath, string caCertificatePassword,
+                              string clientCertificatePath, string clientCertificatePassword)
         {
         	
         	
@@ -125,34 +115,44 @@ namespace IBMWIoTP
             this.caCertificatePassword = caCertificatePassword;
             this.clientCertificatePath = clientCertificatePath;
             this.clientCertificatePassword = clientCertificatePassword;
+			init ();
             
-            String now = DateTime.Now.ToString(".yyyy.MM.dd-THH.mm.fff");
+			
+        }
+        
+		private void init(){
+			String now = DateTime.Now.ToString(".yyyy.MM.dd-THH.mm.fff");
+			string hostName = orgId + DOMAIN;
+			if(String.IsNullOrEmpty(caCertificatePath)  || String.IsNullOrEmpty(clientCertificatePath) || String.IsNullOrEmpty(clientCertificatePassword)){ 		
 
-            string hostName = orgid + DOMAIN;
-			if(String.IsNullOrEmpty(caCertificatePath) || String.IsNullOrEmpty(caCertificatePassword) || String.IsNullOrEmpty(clientCertificatePath) || String.IsNullOrEmpty(clientCertificatePassword)){ 		
-
-	            try {
-	            	X509Certificate cer = new X509Certificate();
-	            	if(File.Exists("message.pem")){
+				try {
+					X509Certificate cer = new X509Certificate();
+					if(File.Exists("message.pem")){
 						cer.Import("message.pem");
-	            	}
-		            log.Info("hostname is :" + hostName);
-		            mqttClient = new MqttClient(hostName,MQTTS_PORT,true,cer,new X509Certificate(),MqttSslProtocols.TLSv1_2);
-            		this._isSecureConnection = true;
-	            
-	            } catch (Exception) {
-	            	log.Warn("hostname is :" + hostName+"  with insecure connection");
-            		this._isSecureConnection = false;
-	            	
-	            	mqttClient = new MqttClient(hostName);
-	            	//throw;
-	            }
-			        		
-            }else{
-	            try {
-	            	X509Certificate2 caCert = new X509Certificate2(caCertificatePath, caCertificatePassword);
+					}
+					log.Info("hostname is :" + hostName);
+					mqttClient = new MqttClient(hostName,MQTTS_PORT,true,cer,new X509Certificate(),MqttSslProtocols.TLSv1_2);
+					mqttClient.ProtocolVersion = MqttProtocolVersion.Version_3_1;
+					mqttClient.ConnectionClosed += ConnectionClosed;
+					this._isSecureConnection = true;
+
+				} catch (Exception) {
+					log.Warn("hostname is :" + hostName+"  with insecure connection");
+					this._isSecureConnection = false;
+
+					mqttClient = new MqttClient(hostName);
+					mqttClient.ProtocolVersion = MqttProtocolVersion.Version_3_1;
+					mqttClient.ConnectionClosed += ConnectionClosed;
+
+					//throw;
+				}
+
+			}else{
+				try {
+
+					X509Certificate2 caCert = new X509Certificate2(caCertificatePath, caCertificatePassword);
 					X509Certificate2 clientCert = new X509Certificate2(clientCertificatePath, clientCertificatePassword);
-	            	
+
 					try{
 						X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
 						store.Open(OpenFlags.ReadWrite);
@@ -161,71 +161,152 @@ namespace IBMWIoTP
 						store.Close();
 					}
 					catch(Exception e){
-						log.Error("Unable to add certifiactes to the store");
-						throw(new Exception("Unable to add certifiactes to the store", e.InnerException));
+						log.Error("Unable to add certificates to the store");
+						throw(new Exception("Unable to add certificates to the store", e.InnerException));
 					}
-					
-	            	
-		            log.Info("hostname is :" + hostName);
-		            mqttClient = new MqttClient(hostName,MQTTS_PORT,true,caCert,clientCert,MqttSslProtocols.TLSv1_2);
-            		this._isSecureConnection = true;
-	            	
-	            }catch (Exception e) {
-		            log.Info("hostname is :" + hostName+"  with insecure connection");
-		            log.Error("Unable to make secure connection" + e.ToString());
-		            throw(new Exception("Unable to make secure connection" , e));
-	            }
-            
-            }
-			
+
+
+					log.Info("hostname is :" + hostName);
+					mqttClient = new MqttClient(hostName,MQTTS_PORT,true,caCert,clientCert,MqttSslProtocols.TLSv1_2);
+					mqttClient.ProtocolVersion = MqttProtocolVersion.Version_3_1;
+					mqttClient.ConnectionClosed += ConnectionClosed;
+
+					this._isSecureConnection = true;
+				}catch (Exception e) {
+					log.Info("hostname is :" + hostName+"  with insecure connection");
+					log.Error("Unable to make secure connection" + e.ToString());
+					if(e is System.Net.Sockets.SocketException && AutoReconnect)
+					{
+						ReInit();
+					}
+					else{
+						throw(new Exception("Unable to make secure connection" , e));
+					}
+				}
+
+			}
+		}       
+        protected void ReInit(){
+        	ReConnectCount++;
+        	try{
+        		int interval = 3000;
+        		if(ReConnectCount > 5)
+        			interval =10000;
+        		if(ReConnectCount >10)
+        			interval = 60000;
+        		log.Info("Retry connecting in " + interval /1000 + " seconds Count :  "+ReConnectCount);
+        		System.Threading.Thread.Sleep(interval);
+		        try{
+		        	init();
+		        	ReConnectCount = 0;
+		        }catch (Exception ex){
+		        	if (ex.InnerException is System.Net.Sockets.SocketException)
+		        		init();
+		        }
+        		
+        		
+        	}
+        	catch (Exception e){
+        		log.Error("Error in ReInit",e.InnerException);
+        		throw new Exception("Error in ReInit",e.InnerException);
+        	}
         }
-        
-               
         /// <summary>
         ///     Connect the device from the IBM Watson IoT Platform
         /// </summary>
         public virtual void connect()
         {
-            try 
-            {
-                
-                if(orgId == "quickstart"){
-                    mqttClient.Connect(clientId);
-                }
-                else
-                {
-                	mqttClient.Connect(clientId, clientUsername, clientPassword);
-                }
-                log.Info("Device Connected to IBM Watson IoT Platform");
-            }
-            catch (Exception e)
-            {
-            	log.Error("Execption has occurred in connecting to MQTT",e);
-            	throw new Exception("Execption has occurred in connecting to MQTT",e);
-            }
+        	//set default values;
+        	isCleanSesson = false;
+        	keepAliveTime = 60;
+        	connect(isCleanSesson, keepAliveTime);
         }
 		/// <summary>
         ///     Connect the device from the IBM Watson IoT Platform
         /// </summary>
         public virtual void connect(bool cleanSession , ushort keepAlivePeriod)
         {
-            try 
+        	_ismanualDisconnect = false;
+            byte connevtionState = MqttMsgConnack.CONN_ACCEPTED;
+ 
+        	try
             {
-                
+        		isCleanSesson = cleanSession;
+        		keepAliveTime = keepAlivePeriod;
                 if(orgId == "quickstart"){
-                    mqttClient.Connect(clientId);
+                    connevtionState = mqttClient.Connect(clientId);
                 }
                 else
                 {
-                	mqttClient.Connect(clientId, clientUsername, clientPassword,cleanSession,keepAlivePeriod);
+                	connevtionState = mqttClient.Connect(clientId, clientUsername, clientPassword,cleanSession,keepAlivePeriod);
                 }
-                log.Info("Device Connected to IBM Watson IoT Platform");
+                
+                log.Info("Connection ack :" + connevtionState);
+                               
             }
             catch (Exception e)
             {
-            	log.Error("Execption has occurred in connecting to MQTT",e);
-            	throw new Exception ("Execption has occurred in connecting to MQTT",e);
+            	log.Error("Exception has occurred in connecting to MQTT",e);
+            	throw new Exception ("Exception has occurred in connecting to MQTT",e.InnerException);
             }
+            switch (connevtionState) {
+        		case MqttMsgConnack.CONN_REFUSED_IDENT_REJECTED :
+        			throw new Exception("CONN_REFUSED_IDENT_REJECTED");
+        		case MqttMsgConnack.CONN_REFUSED_NOT_AUTHORIZED :
+        			throw new Exception("CONN_REFUSED_NOT_AUTHORIZED");
+        		case MqttMsgConnack.CONN_REFUSED_PROT_VERS :
+        			throw new Exception("CONN_REFUSED_PROT_VERS");
+        		case MqttMsgConnack.CONN_REFUSED_SERVER_UNAVAILABLE :
+        			throw new Exception("CONN_REFUSED_SERVER_UNAVAILABLE");
+        		case MqttMsgConnack.CONN_REFUSED_USERNAME_PASSWORD :
+        			throw new Exception("CONN_REFUSED_USERNAME_PASSWORD");
+        		default:
+        			log.Info("Device Connected to IBM Watson IoT Platform");
+        			break;
+ 	       }
+
+        }
+        protected void ReConnect(){
+        	ReConnectCount++;
+        	try{
+        		int interval = 3000;
+        		if(ReConnectCount > 5)
+        			interval =10000;
+        		if(ReConnectCount >10)
+        			interval = 60000;
+        		log.Info("Retry connecting in " + interval /1000 + " seconds Count :  "+ReConnectCount);
+        		
+        		var rcTask = Task.Factory.StartNew(() =>
+			    {
+        		     rcCT.ThrowIfCancellationRequested();
+			        System.Threading.Thread.Sleep(interval);
+			        try{
+				        connect(isCleanSesson, keepAliveTime);
+			        	ReConnectCount = 0;
+			        
+			        }catch (Exception ex){
+			        	if (ex.InnerException is System.Net.Sockets.SocketException)
+			        		ReConnect();
+			        	else
+        		     		rcCT.ThrowIfCancellationRequested();
+			        		
+			        }
+			    },reConnectTask.Token);
+        		
+        	}
+        	catch (Exception e){
+        		log.Error("Error in ReConnect",e.InnerException);
+        		throw new Exception("Error in ReConnect",e.InnerException);
+        	}
+        }
+        private void ConnectionClosed(object sender, EventArgs e){
+        	
+        	log.Info("connection closed "+e.ToString());
+        	if(AutoReconnect && !_ismanualDisconnect){
+        	 	rcCT = reConnectTask.Token;
+        		ReConnect();
+       
+        	}
         }
         /// <summary>
         ///     Disconnect the device from the IBM Watson IoT Platform
@@ -235,14 +316,14 @@ namespace IBMWIoTP
              log.Info("Disconnecting from the IBM Watson IoT Platform");
             try
             {
+            	_ismanualDisconnect = true;
                 mqttClient.Disconnect();
-
                 log.Info("Successfully disconnected from the IBM Watson IoT Platform");
             }
             catch (Exception e)
             {
-            	log.Error("Execption has occurred in disconnecting from MQTT",e);
-            	//throw new Exception("Execption has occurred in disconnecting from MQTT",e);
+            	log.Error("Exception has occurred in disconnecting from MQTT",e);
+            	//throw new Exception("Exception has occurred in disconnecting from MQTT",e);
             }
         }
 
@@ -298,5 +379,10 @@ namespace IBMWIoTP
 			}
 			return myDictionary;
 		}
+        
+         ~AbstractClient(){
+                reConnectTask.Cancel();
+                reConnectTask.Dispose();
+        }
     }
 }

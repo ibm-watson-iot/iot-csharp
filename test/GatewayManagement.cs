@@ -25,6 +25,7 @@ namespace test
 		[SetUp]
 		public void Setup() 
 		{
+			IBMWIoTP.GatewayManagement.AutoReconnect = false;
 			Dictionary<string,string> data = IBMWIoTP.DeviceClient.parseFile("../../Resource/Gatewayprop.txt","## Gateway Registration detail");
 	    	if(	!data.TryGetValue("Organization-ID",out orgId)||
 	    		!data.TryGetValue("Device-Type",out deviceType)||

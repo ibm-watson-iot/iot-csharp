@@ -49,25 +49,35 @@ namespace IBMWIoTP
         
         
         public DeviceClient(string orgId, string deviceType, string deviceID, string authmethod, string authtoken)
-            : base(orgId, "d" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID, "use-token-auth", authtoken)
+            : base(orgId, "d" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID,
+      	       "use-token-auth", authtoken)
         {
 
         }
         
-        public DeviceClient(string orgId, string deviceType, string deviceID, string authmethod, string authtoken, string caCertificatePath, string caCertificatePassword, string clientCertificatePath, string clientCertificatePassword)
-            : base(orgId, "d" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID, "use-token-auth", authtoken,  caCertificatePath,  caCertificatePassword,  clientCertificatePath,  clientCertificatePassword)
+        public DeviceClient(string orgId, string deviceType, string deviceID, string authmethod, string authtoken,
+                            string caCertificatePath, string caCertificatePassword, string clientCertificatePath, 
+                            string clientCertificatePassword)
+            : base(orgId, "d" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID, 
+        	       "use-token-auth", authtoken,  caCertificatePath,  caCertificatePassword,  clientCertificatePath,
+					clientCertificatePassword)
         {
 
         }
         
 
         public DeviceClient(string deviceType, string deviceID)
-            : base("quickstart", "d" + CLIENT_ID_DELIMITER + "quickstart" + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID, null, null)
+            : base("quickstart",
+        	       "d" + CLIENT_ID_DELIMITER + "quickstart" + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID,
+        	       null, null)
         {
 
         }
         public DeviceClient(string filePath) :
-        	base(parseFromFile(filePath), "d" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID, "use-token-auth", _authtoken, _caCertificatePath, _caCertificatePassword, _clientCertificatePath, _clientCertificatePassword)
+        	base(parseFromFile(filePath),
+        	     "d" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID,
+        	     "use-token-auth", _authtoken, _caCertificatePath, _caCertificatePassword,
+        	     _clientCertificatePath, _clientCertificatePassword)
         	
         {
         	
@@ -79,18 +89,30 @@ namespace IBMWIoTP
         	if(	!data.TryGetValue("Organization-ID",out _orgId)||
         		!data.TryGetValue("Device-Type",out _deviceType)||
         		!data.TryGetValue("Device-ID",out _deviceID)||
-        		!data.TryGetValue("Authentication-Method",out _authmethod)||
-        		!data.TryGetValue("Authentication-Token",out _authtoken))
+        		!data.TryGetValue("Authentication-Method",out _authmethod))
         	{
         		throw new Exception("Invalid property file");
         	}
-        	if(	!data.TryGetValue("CA-Certificate-Path",out _caCertificatePath)||
-				!data.TryGetValue("CA-Certificate-Password",out _caCertificatePassword)||
-				!data.TryGetValue("Client-Certificate-Path",out _clientCertificatePath)||
-				!data.TryGetValue("Client-Certificate-Password",out _clientCertificatePassword))
-        	{
-        		//log.Info("Certificate's Not found in the given config file");
+        	try{
+        		bool isAuth = data.TryGetValue("Authentication-Token",out _authtoken);
+        		bool isCaCert = data.TryGetValue("CA-Certificate-Path",out _caCertificatePath);
+        		data.TryGetValue("CA-Certificate-Password",out _caCertificatePassword);
+				bool isClientCert = data.TryGetValue("Client-Certificate-Path",out _clientCertificatePath);
+				data.TryGetValue("Client-Certificate-Password",out _clientCertificatePassword);
+				if(!isAuth && !(isCaCert && isClientCert)){
+					throw new Exception ("No Authentication provided");
+				}
+        		}
+        	catch(Exception ex){
+        		throw new Exception("Invalid property file", ex.InnerException);
         	}
+				                  
+//        	if(	!data.TryGetValue("CA-Certificate-Path",out _caCertificatePath)||
+//				!data.TryGetValue("Client-Certificate-Path",out _clientCertificatePath)||
+//				!data.TryGetValue("Client-Certificate-Password",out _clientCertificatePassword))
+//        	{
+//        		//log.Info("Certificate's Not found in the given config file");
+//        	}
         	return _orgId;
         }
         [Obsolete]
@@ -119,7 +141,7 @@ namespace IBMWIoTP
         		if (!isConnected()) {
 					return false;
 				}
-	           	mqttClient.MqttMsgPublished += client_MqttMsgPublished;
+	           	//mqttClient.MqttMsgPublished += client_MqttMsgPublished;
 	            string topic = "iot-2/evt/" + evt + "/fmt/" + format;
 	            mqttClient.Publish(topic, Encoding.UTF8.GetBytes(msg), qosLevel, false);
 	            log.Info("Published to topic [" + topic + "] msg[" + msg + "]");
@@ -127,9 +149,8 @@ namespace IBMWIoTP
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in Publish Event ",e);
-        		throw new Exception("Execption has occurred in Publish Event ",e);
-				return false;
+        		log.Error("Exception has occurred in Publish Event ",e);
+        		throw new Exception("Exception has occurred in Publish Event ",e);
         		
         	}
         	
@@ -166,14 +187,15 @@ namespace IBMWIoTP
 	            byte[] qos = { qosLevel };
 	            mqttClient.Subscribe(topics, qos);
 	
+	            mqttClient.MqttMsgPublishReceived -= client_MqttMsgPublishReceived;
 	            mqttClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
 	
 	            log.Info("Subscribes to topic to topic [" + topic + "]");
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in subscribeCommand ",e);
-        		throw new Exception("Execption has occurred in subscribeCommand ",e);
+        		log.Error("Exception has occurred in subscribeCommand ",e);
+        		throw new Exception("Exception has occurred in subscribeCommand ",e);
         	}
             
         }
@@ -193,7 +215,7 @@ namespace IBMWIoTP
             }
             catch (Exception ex)
             {
-                log.Error("Execption has occurred in client_EventPublished",ex);
+                log.Error("Exception has occurred in client_EventPublished",ex);
             }
         }
 		[Obsolete]
@@ -222,7 +244,7 @@ namespace IBMWIoTP
             }
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occurred in client_MqttMsgPublishReceived ",ex);
+        		log.Error("Exception has occurred in client_MqttMsgPublishReceived ",ex);
         	}
         }
 

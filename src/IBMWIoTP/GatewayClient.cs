@@ -67,7 +67,9 @@ namespace IBMWIoTP
         /// <param name="authToken">object of String which denotes your authentication token</param>
         
 		public GatewayClient(string orgId, string gatewayDeviceType, string gatewayDeviceID, string authMethod, string authToken)
-            : base(orgId, "g" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + gatewayDeviceType + CLIENT_ID_DELIMITER + gatewayDeviceID, "use-token-auth", authToken)
+            : base(orgId, 
+			       "g" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + gatewayDeviceType + CLIENT_ID_DELIMITER + gatewayDeviceID,
+			       "use-token-auth", authToken)
 		{
 			this.gatewayDeviceID =gatewayDeviceID;
 			this.gatewayDeviceType =gatewayDeviceType;
@@ -75,8 +77,13 @@ namespace IBMWIoTP
 		}
 		
 		
-		public GatewayClient(string orgId, string gatewayDeviceType, string gatewayDeviceID, string authMethod, string authToken, string caCertificatePath, string caCertificatePassword, string clientCertificatePath, string clientCertificatePassword)
-            : base(orgId, "g" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + gatewayDeviceType + CLIENT_ID_DELIMITER + gatewayDeviceID, "use-token-auth", authToken, caCertificatePath,  caCertificatePassword,  clientCertificatePath,  clientCertificatePassword)
+		public GatewayClient(string orgId, string gatewayDeviceType, string gatewayDeviceID, string authMethod, string authToken,
+		                     string caCertificatePath, string caCertificatePassword, string clientCertificatePath, 
+		                     string clientCertificatePassword)
+            : base(orgId,
+			       "g" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + gatewayDeviceType + CLIENT_ID_DELIMITER + gatewayDeviceID, 
+			       "use-token-auth", authToken, caCertificatePath,  caCertificatePassword,
+			       clientCertificatePath,  clientCertificatePassword)
 		{
 			this.gatewayDeviceID =gatewayDeviceID;
 			this.gatewayDeviceType =gatewayDeviceType;
@@ -92,7 +99,10 @@ namespace IBMWIoTP
 		/// </summary>
 		/// <param name="filePath">object of String which denotes file path that contains gateway credentials in specified format</param>
 		public GatewayClient(string filePath)
-            : base(parseFromFile( filePath), "g" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID, "use-token-auth", _authtoken, _caCertificatePath, _caCertificatePassword, _clientCertificatePath, _clientCertificatePassword)
+            : base(parseFromFile( filePath), 
+			       "g" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID,
+			       "use-token-auth", _authtoken, _caCertificatePath, _caCertificatePassword,
+			       _clientCertificatePath, _clientCertificatePassword)
 		{
 			this.gatewayDeviceID =_deviceID;
 			this.gatewayDeviceType =_deviceType;
@@ -109,12 +119,18 @@ namespace IBMWIoTP
         	{
         		throw new Exception("Invalid property file");
         	}
-        	if(	!data.TryGetValue("CA-Certificate-Path",out _caCertificatePath)||
-				!data.TryGetValue("CA-Certificate-Password",out _caCertificatePassword)||
-				!data.TryGetValue("Client-Certificate-Path",out _clientCertificatePath)||
-				!data.TryGetValue("Client-Certificate-Password",out _clientCertificatePassword))
-        	{
-        		//log.Info("Certificate's Not found in the given config file")
+        	try{
+        		bool isAuth = data.TryGetValue("Authentication-Token",out _authtoken);
+        		bool isCaCert = data.TryGetValue("CA-Certificate-Path",out _caCertificatePath);
+        		data.TryGetValue("CA-Certificate-Password",out _caCertificatePassword);
+				bool isClientCert = data.TryGetValue("Client-Certificate-Path",out _clientCertificatePath);
+				data.TryGetValue("Client-Certificate-Password",out _clientCertificatePassword);
+				if(!isAuth && !(isCaCert && isClientCert)){
+					throw new Exception ("No Authentication provided");
+				}
+        		}
+        	catch(Exception ex){
+        		throw new Exception("Invalid property file", ex.InnerException);
         	}
         	return _orgId;
         }
@@ -154,8 +170,8 @@ namespace IBMWIoTP
 		        mqttClient.Subscribe(topics, qosLevels);
 		        
 			} catch (Exception e) {
-                log.Error("Execption has occurred in subscribeToDeviceCommands",e);
-                throw new Exception("Execption has occurred in subscribeToDeviceCommands",e);
+                log.Error("Exception has occurred in subscribeToDeviceCommands",e);
+                throw new Exception("Exception has occurred in subscribeToDeviceCommands",e);
 			}
 		}
 		/// <summary>
@@ -231,7 +247,7 @@ namespace IBMWIoTP
 			string topic = "iot-2/type/" + deviceType + "/id/" + deviceId + "/evt/" + evt + "/fmt/json";
 			var json = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(payload);
 			mqttClient.Publish(topic, Encoding.UTF8.GetBytes(json), 0, false);
-			mqttClient.MqttMsgPublished += client_MqttMsgPublished;
+			//mqttClient.MqttMsgPublished += client_MqttMsgPublished;
 			return true;
 		}
 		[Obsolete]
@@ -254,7 +270,7 @@ namespace IBMWIoTP
             }
             catch (Exception ex)
             {
-                log.Error("Execption has occurred in client_EventPublished",ex);
+                log.Error("Exception has occurred in client_EventPublished",ex);
             }
         }
 		[Obsolete]
@@ -305,8 +321,8 @@ namespace IBMWIoTP
             }
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occurred in client_MqttMsgPublishReceived ",ex);
-        		throw new Exception("Execption has occurred in client_MqttMsgPublishReceived ",ex);
+        		log.Error("Exception has occurred in client_MqttMsgPublishReceived ",ex);
+        		throw new Exception("Exception has occurred in client_MqttMsgPublishReceived ",ex);
         	}
         }
 

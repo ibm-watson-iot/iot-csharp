@@ -151,8 +151,8 @@ namespace IBMWIoTP
 	         }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in subscribeToDeviceStatus ",e);
-        		throw new Exception("Execption has occurred in subscribeToDeviceStatus ",e);
+        		log.Error("Exception has occurred in subscribeToDeviceStatus ",e);
+        		throw new Exception("Exception has occurred in subscribeToDeviceStatus ",e);
         	}
         }
 
@@ -188,8 +188,8 @@ namespace IBMWIoTP
              }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in subscribeToDeviceStatus ",e);
-        		throw new Exception("Execption has occurred in subscribeToDeviceStatus ",e);
+        		log.Error("Exception has occurred in subscribeToDeviceStatus ",e);
+        		throw new Exception("Exception has occurred in subscribeToDeviceStatus ",e);
         	}
         }
 
@@ -211,8 +211,8 @@ namespace IBMWIoTP
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in subscribeToApplicationStatus ",e);
-        		throw new Exception("Execption has occurred in subscribeToApplicationStatus ",e);
+        		log.Error("Exception has occurred in subscribeToApplicationStatus ",e);
+        		throw new Exception("Exception has occurred in subscribeToApplicationStatus ",e);
         	}
         }
         /// <summary>
@@ -267,8 +267,8 @@ namespace IBMWIoTP
         	}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in subscribeToDeviceEvents ",e);
-        		throw new Exception("Execption has occurred in subscribeToDeviceEvents ",e);
+        		log.Error("Exception has occurred in subscribeToDeviceEvents ",e);
+        		throw new Exception("Exception has occurred in subscribeToDeviceEvents ",e);
         	}
         }
 
@@ -299,8 +299,8 @@ namespace IBMWIoTP
 	        }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in subscribeToDeviceEvents ",e);
-        		throw new Exception("Execption has occurred in subscribeToDeviceEvents ",e);
+        		log.Error("Exception has occurred in subscribeToDeviceEvents ",e);
+        		throw new Exception("Exception has occurred in subscribeToDeviceEvents ",e);
         	}    
         }
 
@@ -378,7 +378,7 @@ namespace IBMWIoTP
 	        }
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occurred in client_MqttMsgArrived ",ex);
+        		log.Error("Exception has occurred in client_MqttMsgArrived ",ex);
         	}
         }
   
@@ -458,9 +458,8 @@ namespace IBMWIoTP
             }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in publishCommand ",e);
-        		throw new Exception("Execption has occurred in publishCommand ",e);
-        		return false;
+        		log.Error("Exception has occurred in publishCommand ",e);
+        		throw new Exception("Exception has occurred in publishCommand ",e);
         	}
         }
 
@@ -524,9 +523,8 @@ namespace IBMWIoTP
 	        }
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in publishEvent ",e);
-        		throw new Exception("Execption has occurred in publishEvent ",e);
-        		return false;
+        		log.Error("Exception has occurred in publishEvent ",e);
+        		throw new Exception("Exception has occurred in publishEvent ",e);
         	}
         }
         

@@ -25,6 +25,7 @@ namespace test
 		[SetUp]
 		public void Setup() 
 		{
+			IBMWIoTP.GatewayClient.AutoReconnect = false;
 			testClient = new IBMWIoTP.GatewayClient("../../Resource/Gatewayprop.txt");
 		}
 		[Test]

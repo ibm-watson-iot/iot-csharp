@@ -12,16 +12,38 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
-
+using System.Threading.Tasks;
 using IBMWIoTP;
 using NUnit.Framework;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Exceptions;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
+namespace IBMWIoTP{
+	public class mockDevice :DeviceClient
+	{
+		public mockDevice(string orgId, string deviceType, string deviceID, string authmethod, string authtoken):
+			base(orgId, deviceType, deviceID, authmethod, authtoken)
+		{
+		}
+		
+		public void mockMqttDisconnect(){
+			this.mqttClient.Disconnect();
+			
+		}
+		public MqttClient getClient(){
+			return mqttClient;
+		}
+		public int getCount(){
+			return ReConnectCount;
+		}
+	}
+}
 namespace test
 {
+
 	[TestFixture]
 	public class DeviceClient 
 	{
@@ -31,6 +53,7 @@ namespace test
 		[SetUp]
 		public void Setup() 
 		{
+			IBMWIoTP.DeviceClient.AutoReconnect=false;
 			testClient = new IBMWIoTP.DeviceClient("../../Resource/prop.txt");
 		}
 		[Test,ExpectedException (typeof(System.Net.Sockets.SocketException))]
@@ -90,13 +113,15 @@ namespace test
 		[Test]
 		public void DeviceClientConnectionStatus()
 		{
-			testClient.connect();
+			if(!testClient.isConnected())
+				testClient.connect();
 			Assert.IsTrue(testClient.isConnected());
 		}
 		[Test]
 		public void DeviceClientTostring()
 		{
-			testClient.connect();
+			if(!testClient.isConnected())
+				testClient.connect();
 			var str = testClient.toString();
 			Assert.AreEqual(str,"[d:"+orgId+":"+deviceType+":"+deviceID+"] Connected = True" );
 		}
@@ -154,6 +179,65 @@ namespace test
 			testClient.disconnect();
 			Assert.IsFalse(testClient.isConnected());
 		}
-		
+		[Test]
+		public void DeviceClientAutoReconnect()
+		{
+		  IBMWIoTP.DeviceClient.DOMAIN="its.not.reachable.com";
+		  IBMWIoTP.DeviceClient.MQTTS_PORT=3000;
+		  IBMWIoTP.DeviceClient.AutoReconnect = true;
+		  var canceller = new CancellationTokenSource();
+
+		  Task.Factory.StartNew(() =>
+		    {
+			    System.Threading.Thread.Sleep(1000);
+		        IBMWIoTP.DeviceClient.DOMAIN = ".messaging.internetofthings.ibmcloud.com";
+	 			IBMWIoTP.DeviceClient.MQTTS_PORT=8883;
+	 			 System.Threading.Thread.Sleep(3000);
+	 			testClient.connect();
+	 			Assert.IsTrue(testClient.isConnected());
+		 		IBMWIoTP.DeviceClient.AutoReconnect = false;
+		 		canceller.Cancel();
+	 			
+	 			},canceller.Token);
+		  testClient = new IBMWIoTP.DeviceClient("../../Resource/prop.txt");
+
+
+		}
+		[Test]
+		public void DeviceClientAutoReconnectLocal()
+		{
+	        IBMWIoTP.DeviceClient.DOMAIN = ".messaging.internetofthings.ibmcloud.com";
+		 	IBMWIoTP.DeviceClient.MQTTS_PORT=8883;
+		 	IBMWIoTP.mockDevice.AutoReconnect = true;
+		 	Dictionary<string,string> data = IBMWIoTP.DeviceClient.parseFile("../../Resource/prop.txt","## Device Registration detail");
+	    	if(	!data.TryGetValue("Organization-ID",out orgId)||
+	    		!data.TryGetValue("Device-Type",out deviceType)||
+	    		!data.TryGetValue("Device-ID",out deviceID)||
+	    		!data.TryGetValue("Authentication-Method",out authmethod)||
+	    		!data.TryGetValue("Authentication-Token",out authtoken) )
+	    	{
+	    		throw new Exception("Invalid property file");
+	    	}		
+			var testMock = new IBMWIoTP.mockDevice(orgId,deviceType,deviceID,authmethod,authtoken);
+			testMock.connect();
+			Assert.IsTrue(testMock.isConnected());
+			//hard Disconnecte
+			testMock.mockMqttDisconnect();
+		  	var canceller = new CancellationTokenSource();
+			
+			Task.Factory.StartNew(() =>
+		    {
+				Assert.Greater(testMock.getCount(),0);
+				System.Threading.Thread.Sleep(5000);//wait for auto reconnect in 3 sec 2sec connectiion buffer
+				Assert.IsTrue(testMock.getClient().IsConnected);
+				Assert.AreEqual(testMock.getCount(),0);
+		 		IBMWIoTP.mockDevice.AutoReconnect = false;
+		 		canceller.Cancel();
+		 		
+			  },canceller.Token);
+
+		}
+	 	  
+
 	}
 }

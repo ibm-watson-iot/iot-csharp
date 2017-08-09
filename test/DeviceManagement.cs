@@ -26,6 +26,7 @@ namespace test
 		[SetUp]
 		public void Setup() 
 		{
+			IBMWIoTP.DeviceManagement.AutoReconnect = false;
 			testClient = new IBMWIoTP.DeviceManagement("../../Resource/prop.txt",true);
 		}
 		[Test]
