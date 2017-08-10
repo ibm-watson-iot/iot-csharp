@@ -186,7 +186,7 @@ namespace IBMWIoTP
 					
 					case DM_REBOOT_TOPIC :
 					 	var res = serializer.Deserialize<DMResponse>(result);
-						log.Info("Device Rebot action called with ReqId : " +res.reqId );
+						log.Info("Device Reboot action called with ReqId : " +res.reqId );
 						if(this.actionCallback != null)
 							this.actionCallback(res.reqId , "reboot");
 						break;
@@ -264,7 +264,7 @@ namespace IBMWIoTP
 			}
         	catch(Exception ex)
         	{
-        		log.Error("Execption has occurred in subscriptionHandler ",ex);
+        		log.Error("Exception has occurred in subscriptionHandler ",ex);
         	}
 
         }
@@ -313,9 +313,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in manage ",e);
-        		throw new Exception("Execption has occurred in manage ",e);
-        		return "";
+        		log.Error("Exception has occurred in manage ",e);
+        		throw new Exception("Exception has occurred in manage ",e);
         	}
 		
 		}
@@ -346,9 +345,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in manage ",e);
-        		throw new Exception("Execption has occurred in manage ",e);
-        		return "";
+        		log.Error("Exception has occurred in manage ",e);
+        		throw new Exception("Exception has occurred in manage ",e);
         	}
 			
 		}
@@ -366,9 +364,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in unmanage ",e);
-        		throw new Exception("Execption has occurred in unmanage ",e);
-        		return "";
+        		log.Error("Exception has occurred in unmanage ",e);
+        		throw new Exception("Exception has occurred in unmanage ",e);
         	}
 		}
 		/// <summary>
@@ -390,9 +387,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in addErrorCode ",e);
-        		throw new Exception("Execption has occurred in addErrorCode ",e);
-        		return "";
+        		log.Error("Exception has occurred in addErrorCode ",e);
+        		throw new Exception("Exception has occurred in addErrorCode ",e);
         	}
 		}
 		
@@ -411,9 +407,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in clearErrorCode ",e);
-        		throw new Exception("Execption has occurred in clearErrorCode ",e);
-        		return "";
+        		log.Error("Exception has occurred in clearErrorCode ",e);
+        		throw new Exception("Exception has occurred in clearErrorCode ",e);
         	}
 		}
 		/// <summary>
@@ -440,9 +435,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in addLog ",e);
-        		throw new Exception("Execption has occurred in addLog ",e);
-        		return "";
+        		log.Error("Exception has occurred in addLog ",e);
+        		throw new Exception("Exception has occurred in addLog ",e);
         	}
 		}
 		
@@ -461,9 +455,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in clearLog ",e);
-        		throw new Exception("Execption has occurred in clearLog ",e);
-        		return "";
+        		log.Error("Exception has occurred in clearLog ",e);
+        		throw new Exception("Exception has occurred in clearLog ",e);
         	}
 		}
 		/// <summary>
@@ -491,9 +484,8 @@ namespace IBMWIoTP
 			}
         	catch(Exception e)
         	{
-        		log.Error("Execption has occurred in setLocation ",e);
-        		throw new Exception("Execption has occurred in setLocation ",e);
-        		return "";
+        		log.Error("Exception has occurred in setLocation ",e);
+        		throw new Exception("Exception has occurred in setLocation ",e);
         	}
 		}
 		/// <summary>

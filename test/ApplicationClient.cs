@@ -23,6 +23,7 @@ namespace test
 		[SetUp]
 		public void Setup() 
 		{
+			IBMWIoTP.AbstractClient.AutoReconnect = false;
 			testApp = new IBMWIoTP.ApplicationClient("../../Resource/AppProp.txt");
 		}
 		[Test,ExpectedException (typeof(System.Net.Sockets.SocketException))]
