@@ -25,7 +25,7 @@ Supported Features
 | Device Management | &#10004; | Connects your device/gateway as managed device/gateway to Watson IoT Platform.
 | Device Management Extension(DME) | &#10008; | Provides support for custom device management actions.
 | Scalable Application | &#10004; | Provides support for load balancing for applications.
-| Auto reconnect | &#10008; | Enables device/gateway/application to automatically reconnect to Watson IoT Platform while they are in a disconnected state.
+| Auto reconnect | &#10004; | Enables device/gateway/application to automatically reconnect to Watson IoT Platform while they are in a disconnected state.
 | Websocket | &#10008; | Enables device/gateway/application to connect to Watson IoT Platform using WebSockets.
 | Event/Command publish using MQTT| &#10004; |  Enables device/gateway/application to publish messages using MQTT.
 | Event/Command publish using HTTP| &#10008; | Enables device/gateway/application to publish messages using HTTP.
