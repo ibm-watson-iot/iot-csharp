@@ -1,0 +1,11 @@
+{
+  "type": "object", 
+   "properties" : {
+    "temperature" : {
+      "description" : "temperature in degrees Celsius",
+      "type" : "number",
+      "minimum" : -273.15,
+      "default" : 0.0
+    }
+  }
+}
