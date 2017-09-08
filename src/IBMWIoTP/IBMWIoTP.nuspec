@@ -6,12 +6,12 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://github.com/ibm-messaging/iot-csharp/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/ibm-messaging/iot-csharp</projectUrl>
+    <licenseUrl>https://github.com/ibm-watson-iot/iot-csharp/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/ibm-watson-iot/iot-csharp</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes></releaseNotes>
-    <copyright>Copyright (c) 2016 IBM Corporation</copyright>
+    <copyright>Copyright (c) 2017 IBM Corporation</copyright>
     <tags>IBM iot</tags>
   </metadata>
 </package>
