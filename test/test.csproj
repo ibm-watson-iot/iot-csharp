@@ -39,8 +39,14 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net4\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web.Extensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Xml" />
@@ -54,6 +60,7 @@
     <Compile Include="DeviceManagement.cs" />
     <Compile Include="GatewayClient.cs" />
     <Compile Include="GatewayManagement.cs" />
+    <Compile Include="IMApi.cs" />
     <Compile Include="Info.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DeviceClient.cs" />

@@ -10,6 +10,7 @@ This C# Client Library can be used to simplify interactions with the [IBM Watson
 - The [Application section](docs/Application.rst) details how applications can use the C# IBMWIoTP Client Library to interact with devices.
 - The [API section](docs/API.rst) contains information on how applications can use the C# IBMWIoTP Client Library to interact with the organization in the Watson IoT Platform through REST APIs
 - The [Client Certificate section](docs/CACertificate.md) contains information on how to connect devices/gateway with Client side Certificate based authentication.
+- The [Information Management section](docs/IMApi.md) contains information onhow applications can use the C# IBMWIoTP Client Library to interact with the organization in the Watson IoT Platform Information Management APIs
 
 Supported Features
 ------------------
@@ -20,6 +21,7 @@ Supported Features
 | Gateway connectivity |    &#10004;   |  Connect your gateway(s) to Watson IoT Platform with ease using this library.
 | Application connectivity | &#10004; | Connect your application(s) to Watson IoT Platform with ease using this library.
 | Watson IoT API | &#10004; | Shows how applications can use this library to interact with the Watson IoT Platform through REST APIs.
+| Information Management API | &#10004; | Shows how applications can use this library to configure and implement Information Management APIs in the Watson IoT Platform.
 | SSL/TLS | &#10004; | By default, this library connects your devices, gateways and applications **securely** to Watson IoT Platform registered service.
 | Client side Certificate based authentication | &#10004; | Client side Certificate based authentication
 | Device Management | &#10004; | Connects your device/gateway as managed device/gateway to Watson IoT Platform.
@@ -47,6 +49,7 @@ Dependencies
 
 -  [Paho M2MQTT] (https://www.nuget.org/packages/M2Mqtt/) - provides a client class which enable applications to connect to an MQTT broker
 -  [log4net] (https://www.nuget.org/packages/log4net/) - library for creating log.
+-  [RestSharp] (https://www.nuget.org/packages/RestSharp/) - Simple REST and HTTP API Client
 
 ----
 
@@ -64,6 +67,7 @@ You can find samples in each of the corresponding repositories as follows:
 * [Application samples](https://github.com/ibm-watson-iot/iot-csharp/tree/master/sample/GatewayMgmtAction) - Repository contains samples for developing the application(s) in IBM Watson Internet of Things Platform in different languages.
 * [Watson IoT Platform API V002 samples](https://github.com/ibm-watson-iot/iot-csharp/tree/master/sample/ApiClient) - Repository contains samples that interacts with IBM Watson IoT Platform using the platform API Version 2.
 * [Client Certificate samples](https://github.com/ibm-watson-iot/iot-csharp/tree/master/sample/ClentCA_Authentication) - Repository contains samples for connecting devices/gateway with Client side Certificate based authentication to IBM Watson IoT Platform.
+* [Information Management samples](https://github.com/ibm-watson-iot/iot-csharp/tree/master/sample/IMClient) - Repository contains samples for Information Management of device events in IBM Watson IoT Platform.
 
 ----
 

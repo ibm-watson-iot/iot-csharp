@@ -11,6 +11,7 @@
  */
  
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 
 namespace IBMWIoTP
@@ -221,7 +222,222 @@ namespace IBMWIoTP
 	}
 	
 	
+	public class SchemaDraft {
 	
+		public SchemaDraft(){
+			this.schemaType = "json-schema";
+		}
+		public string schemaType {get;set;}
+		public string description {get;set;}
+		public string name {get;set;}
+		public string schemaFile {get;set;}
+		public bool Validate(){
+			return !(String.IsNullOrEmpty(this.schemaFile)|| String.IsNullOrEmpty(this.name));
+		}
+	}
+	public class RefContent
+	{
+	    public string content { get; set; }
+	}
+	
+	public class SchemaInfo
+	{
+	    public string id { get; set; }
+	    public string name { get; set; }
+	    public string description { get; set; }
+	    public string schemaType { get; set; }
+	    public string schemaFileName { get; set; }
+	    public string contentType { get; set; }
+	    public string version { get; set; }
+	    public string created { get; set; }
+	    public string createdBy { get; set; }
+	    public string updated { get; set; }
+	    public string updatedBy { get; set; }
+	    public RefContent refs { get; set; }
+	}
+
+  	
+	public class EventTypeDraft
+    {
+        public string name { get; set; }
+        public string description { get; set; }
+        public string schemaId { get; set; }
+    }
+	
+	public class RefSchema
+    {
+        public string schema { get; set; }
+    }
+
+    public class EventTypeInfo
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public string schemaId { get; set; }
+        public string version { get; set; }
+        public string created { get; set; }
+        public string createdBy { get; set; }
+        public string updated { get; set; }
+        public string updatedBy { get; set; }
+        public RefSchema refs { get; set; }
+    }
+    public class PhysicalInterfaceDraft
+    {
+        public string name { get; set; }
+        public string description { get; set; }
+    }
+    
+    public class RefEvents
+    {
+        public string events { get; set; }
+    }
+
+    public class PhysicalInterfacesInfo
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public string version { get; set; }
+        public string created { get; set; }
+        public string createdBy { get; set; }
+        public string updated { get; set; }
+        public string updatedBy { get; set; }
+        public RefEvents refs { get; set; }
+    }
+    
+    public class EventTypeBind
+    {
+        public string eventId { get; set; }
+        public string eventTypeId { get; set; }
+    }
+    
+    public class LogicalInterfaceDraft
+    {
+        public string name { get; set; }
+        public string description { get; set; }
+        public string schemaId { get; set; }
+    }
+    
+    public class LogicalInterfaceInfo
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public string schemaId { get; set; }
+        public string version { get; set; }
+        public string created { get; set; }
+        public string createdBy { get; set; }
+        public string updated { get; set; }
+        public string updatedBy { get; set; }
+        public RefSchema refs { get; set; }
+    }
+    public class LogicalInterfaceInfoupdate
+    {
+        public string id { get; set; }
+        public string description { get; set; }
+        public string schemaId { get; set; }
+        public string version { get; set; }
+        public string created { get; set; }
+        public string createdBy { get; set; }
+        public string updated { get; set; }
+        public string updatedBy { get; set; }
+        public RefSchema refs { get; set; }
+    }
+    public class OperationInfo
+    {
+    	public const string Validate = "validate-configuration";
+    	public const string Activate = "activate-configuration";
+    	public const string ListDifferences = "list-differences";
+    	public const string Deactivate = "deactivate-configuration";
+    	
+    	public OperationInfo(string operation){
+    		this.operation = operation;
+    	}
+        public string operation { get; set; }
+    }
+    public class Details
+    {
+        public string id { get; set; }
+        public string[] properties { get; set; }
+    }
+
+    public class FailuresDetails
+    {
+        public string id { get; set; }
+        public object[] properties { get; set; }
+    }
+
+    public class Failures
+    {
+        public string message { get; set; }
+        public FailuresDetails details { get; set; }
+    }
+
+    public class OperationResponse
+    {
+        public string message { get; set; }
+        public Details details { get; set; }
+        public Failures[] failures { get; set; }
+    }
+    public class OperationDraftResponse
+    {
+        public string message { get; set; }
+        public Details details { get; set; }
+        public object failures { get; set; }
+    }
+
+    public class MappingDraft
+    {
+        public string logicalInterfaceId { get; set; }
+        public string notificationStrategy { get; set; }
+        public object propertyMappings { get; set; }
+    }
+    
+    public class MappingInfo
+    {
+        public string logicalInterfaceId { get; set; }
+        public string notificationStrategy { get; set; }
+        public object propertyMappings { get; set; }
+        public string version { get; set; }
+        public string created { get; set; }
+        public string createdBy { get; set; }
+        public string updated { get; set; }
+        public string updatedBy { get; set; }
+    }
+    
+    
+    public class Meta
+	{
+	    public string facets { get; set; }
+	    public int totalRows { get; set; }
+	}
+	
+	public class EventTypeCollection
+	{
+	    public string bookmark { get; set; }
+	    public Meta meta { get; set; }
+	    public List<EventTypeInfo> results { get; set; }
+	}
+	
+	public class LogicalInterfaceCollection
+	{
+	    public string bookmark { get; set; }
+	    public Meta meta { get; set; }
+	    public List<LogicalInterfaceInfo> results { get; set; }
+	}
+	public class PhysicalInterfacesCollection
+	{
+	    public string bookmark { get; set; }
+	    public Meta meta { get; set; }
+	    public List<PhysicalInterfacesInfo> results { get; set; }
+	}
+	public class SchemaCollection
+    {
+        public string bookmark { get; set; }
+        public Meta meta { get; set; }
+        public SchemaInfo[] results { get; set; }
+    }
 //	public class OrgInfo {
 //	
 //		public OrgInfo(){}

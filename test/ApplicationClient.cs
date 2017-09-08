@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using IBMWIoTP;
 using NUnit.Framework;
+using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace test
 {
@@ -116,6 +117,28 @@ namespace test
 		public void ApplicationClientgetApiClient(){
 			IBMWIoTP.ApiClient cli = testApp.GetAPIClient();
 			Assert.IsInstanceOf<IBMWIoTP.ApiClient>(cli);
+		}
+		[Test]
+		public void  ApplicationClientSubscribeToIMState(){
+			testApp.subscribeToIMState();
+			string typeId = "";
+			string deviceId = "";
+			string LIId ="";
+			string json = "";
+			testApp.IMStateCallback += (dt,did,liid,data)=>{
+				typeId =dt;
+				deviceId = did;
+				LIId = liid;
+				json = data;
+			};
+			string msg = "name:foo,cpu:60,mem:50";
+			MqttMsgPublishEventArgs evt = new MqttMsgPublishEventArgs("iot-2/type/demotest/id/1qaz2wsx/intf/59a6c41052faff002c332a3b/evt/state",System.Text.Encoding.UTF8.GetBytes(msg),false,1,true);
+			testApp.client_MqttMsgArrived(new {},evt);
+			Assert.AreEqual("demotest",typeId);
+			Assert.AreEqual("1qaz2wsx",deviceId);
+			Assert.AreEqual("59a6c41052faff002c332a3b",LIId);
+			Assert.AreEqual(msg,json);
+			
 		}
 	}
 }

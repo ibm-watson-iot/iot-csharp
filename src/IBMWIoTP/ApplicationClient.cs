@@ -56,11 +56,19 @@ namespace IBMWIoTP
         public delegate void processAppStatus(String appId, string data);
         // event for application status callback
         public event processAppStatus appStatusCallback;
+        
+        /// <summary>
+        ///   Delegate that defines status handler for InformationManagementState
+        /// </summary>
+        public delegate void processInformationManagementState(string deviceType, string deviceId, string logicalInterfaceId , string data);
+         // event for Information ManagementState status callback
+        public event processInformationManagementState IMStateCallback;
 
         private static string DEVICE_EVENT_PATTERN = "iot-2/type/(.+)/id/(.+)/evt/(.+)/fmt/(.+)";
         private static string DEVICE_STATUS_PATTERN = "iot-2/type/(.+)/id/(.+)/mon";
         private static string APP_STATUS_PATTERN = "iot-2/app/(.+)/mon";
         private static string DEVICE_COMMAND_PATTERN = "iot-2/type/(.+)/id/(.+)/cmd/(.+)/fmt/(.+)";
+        private static string IM_PATTERN = "iot-2/type/(.+)/id/(.+)/intf/(.+)/evt/state";
         
         private static string _orgId,  _appID,  _apiKey,  _authToken;
         private static bool _isShared =false;
@@ -71,12 +79,18 @@ namespace IBMWIoTP
         public ApplicationClient(string OrgId, string appID, string apiKey, string authToken)
             : base(OrgId, "a" + CLIENT_ID_DELIMITER + OrgId + CLIENT_ID_DELIMITER + appID, apiKey, authToken)
         {
-
+			_orgId = OrgId;
+			_appID = appID;
+			_apiKey = apiKey;
+			_authToken = authToken;
         }
          public ApplicationClient(string OrgId, string appID, string apiKey, string authToken,bool isShared)
          	: base(OrgId, getClientId(isShared,OrgId,appID), apiKey, authToken)
         {
-
+			_orgId = OrgId;
+			_appID = appID;
+			_apiKey = apiKey;
+			_authToken = authToken;
         }
         public ApplicationClient(string filePath)
         	: base(parseFromFile(filePath), getClientId(_isShared, _orgId, _appID), _apiKey, _authToken)
@@ -92,7 +106,7 @@ namespace IBMWIoTP
         public ApplicationClient(string appID,bool isQuickStart)
             : base("quickstart", "a" + CLIENT_ID_DELIMITER + "quickstart" + CLIENT_ID_DELIMITER + appID, null, null)
         {
-
+			_orgId = "quickstart";
         }
         
 		private static string parseFromFile(string filePath)
@@ -238,8 +252,36 @@ namespace IBMWIoTP
         {
             subscribeToDeviceEvents(deviceType, deviceId, evt, "+", 0);
         } 
+        
+        public void subscribeToIMState(){
+        	subscribeToIMState("+");
+        }
 
-
+        public void subscribeToIMState(string deviceType){
+        	subscribeToIMState(deviceType,"+");
+        }
+        public void subscribeToIMState(string deviceType, string deviceId){
+        	subscribeToIMState(deviceType,deviceId,"+");
+        }
+        public void subscribeToIMState(string deviceType, string deviceId, string logicalInterfaceId ){
+        	subscribeToIMState(deviceType,deviceId,logicalInterfaceId,0);
+        }
+        public void subscribeToIMState(string deviceType, string deviceId, string logicalInterfaceId , byte qos){
+        	try
+        	{
+	            string newTopic = "iot-2/type/" + deviceType + "/id/" + deviceId + "/intf/" + logicalInterfaceId + "/evt/state";
+	            string[] topics = { newTopic };
+	            byte[] qosLevels = { qos };
+	            mqttClient.Subscribe(topics, qosLevels);
+	            mqttClient.MqttMsgPublishReceived -= client_MqttMsgArrived;
+	            mqttClient.MqttMsgPublishReceived += client_MqttMsgArrived;
+        	}
+        	catch(Exception e)
+        	{
+        		log.Error("Exception has occurred in IMState ",e);
+        		throw new Exception("Exception has occurred in IMState ",e);
+        	}
+        }
         /// <summary>
         ///     Subscribe to device events of the IBM Internet of Things Foundation. <br>
         /// </summary>
@@ -303,6 +345,7 @@ namespace IBMWIoTP
         		throw new Exception("Exception has occurred in subscribeToDeviceEvents ",e);
         	}    
         }
+        
 
         /// <summary>
         ///     Message subscription when subscribed event occurreds or subscribed command executes <br>
@@ -335,9 +378,9 @@ namespace IBMWIoTP
 	            Match matchEvent = Regex.Match(topic, DEVICE_EVENT_PATTERN);
 	            if (matchEvent.Success)
 	            {
-	                log.Info("Match event..." + matchEvent.Groups[3].Value);
 	                if (eventCallback != null)
 	                {
+	                	log.Info("Match event :" + matchEvent.Groups[3].Value);
 	                    this.eventCallback(matchEvent.Groups[1].Value,matchEvent.Groups[2].Value,matchEvent.Groups[3].Value, matchEvent.Groups[4].Value, result);
 	                }
 	                return;
@@ -346,9 +389,9 @@ namespace IBMWIoTP
 	            Match matchDeviceStatus = Regex.Match(topic, DEVICE_STATUS_PATTERN);
 	            if (matchDeviceStatus.Success)
 	            {
-	                log.Info("Match device Status..." + matchDeviceStatus.Groups[1].Value);
 	                if (deviceStatusCallback != null)
 	                {
+	                	log.Info("Match device Status :" + matchDeviceStatus.Groups[1].Value);
 	                    this.deviceStatusCallback(matchDeviceStatus.Groups[1].Value, matchDeviceStatus.Groups[2].Value, result);
 	                }
 	                return;
@@ -357,9 +400,9 @@ namespace IBMWIoTP
 	            Match matchAppStatus = Regex.Match(topic, APP_STATUS_PATTERN);
 	            if (matchAppStatus.Success)
 	            {
-	                log.Info("Match app Status..." + matchAppStatus.Groups);
 	                if (appStatusCallback != null)
 	                {
+	                	log.Info("Match app Status :" + matchAppStatus.Groups);
 	                    this.appStatusCallback(matchAppStatus.Groups[1].Value, result);
 	                }
 	                return;
@@ -368,10 +411,20 @@ namespace IBMWIoTP
 	            Match matchCommand = Regex.Match(topic, DEVICE_COMMAND_PATTERN);
 	            if (matchCommand.Success)
 	            {
-	                log.Info("Match command..." + matchCommand.Groups);
 	                if (commandCallback != null)
 	                {
+	               		log.Info("Match command :" + matchCommand.Groups);
 	                    this.commandCallback(matchCommand.Groups[3].Value, matchCommand.Groups[4].Value, result);
+	                }
+	                return;
+	            }
+	            Match matchIMState = Regex.Match(topic, IM_PATTERN);
+	            if (matchIMState.Success)
+	            {
+	                if (IMStateCallback != null)
+	                {
+	                	log.Info("Match IMState :" + matchCommand.Groups);
+	                    this.IMStateCallback(matchIMState.Groups[1].Value, matchIMState.Groups[2].Value, matchIMState.Groups[3].Value, result);
 	                }
 	                return;
 	            }
@@ -528,8 +581,15 @@ namespace IBMWIoTP
         	}
         }
         
-        
+        /// <summary>
+        /// Get API client instance 
+        /// </summary>
+        /// <returns>ApiClient object</returns>
         public ApiClient GetAPIClient(){
+        	if(_orgId == "quickstart")
+        	{
+        		throw new Exception(" Api client can't be created for quickstart");
+        	}
         	return new ApiClient(_apiKey , _authToken);
         }
 
