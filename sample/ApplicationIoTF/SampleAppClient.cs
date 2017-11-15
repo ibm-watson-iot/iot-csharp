@@ -75,7 +75,14 @@ namespace com.ibm.iotf.client.app.sample
                 applicationClient.publishCommand(deviceType, deviceId, "testcmd", "json", data, 0);
                 
                 Console.ReadKey();
-
+                applicationClient.unsubscribeToDeviceEvents(deviceType, deviceId, evt, format);
+            
+ 				Console.ReadKey();
+                 applicationClient.subscribeToDeviceEvents(deviceType, deviceId, evt, format, 0);
+            	Console.ReadKey();
+               
+                
+			
                 applicationClient.disconnect();
             }
             catch (Exception)

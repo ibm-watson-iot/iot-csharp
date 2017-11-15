@@ -154,12 +154,6 @@ namespace IBMWIoTP
         {
         	try
         	{
-//	            String newTopic = "iot-2/type/" + deviceType + "/id/" + deviceId + "/mon";
-//	            string[] topics = { newTopic };
-//	            byte[] qosLevels = { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE };
-//	            mqttClient.Subscribe(topics, qosLevels);
-//	            mqttClient.MqttMsgPublishReceived -= client_MqttMsgArrived;
-//	            mqttClient.MqttMsgPublishReceived += client_MqttMsgArrived;
         		subscribeToDeviceStatus(deviceType,deviceId,0);
         		
 	         }
@@ -206,6 +200,15 @@ namespace IBMWIoTP
         		throw new Exception("Exception has occurred in subscribeToDeviceStatus ",e);
         	}
         }
+        
+        /// <summary>
+        ///     Subscribe to application status of the IBM Internet of Things Foundation. <br>
+        /// </summary>
+        public void subscribeToApplicationStatus()
+        {
+            subscribeToApplicationStatus("+");
+        }
+
 
         /// <summary>
         ///     Subscribe to application status of the IBM Internet of Things Foundation. <br>
@@ -229,14 +232,7 @@ namespace IBMWIoTP
         		throw new Exception("Exception has occurred in subscribeToApplicationStatus ",e);
         	}
         }
-        /// <summary>
-        ///     Subscribe to application status of the IBM Internet of Things Foundation. <br>
-        /// </summary>
-        public void subscribeToApplicationStatus()
-        {
-            subscribeToApplicationStatus("+");
-        }
-
+     
       
         public void subscribeToDeviceEvents()
         {
@@ -247,41 +243,27 @@ namespace IBMWIoTP
         {
             subscribeToDeviceEvents(deviceType, "+", "+", "+", 0);
         }
+        
+        /// <summary>
+        ///     Subscribe to device events of the IBM Internet of Things Foundation. <br>
+        ///     Quality of Service is set to 0 <br>
+        ///     All events, of a given device type and device id, are subscribed to.
+        /// </summary>
+        /// <param name="deviceType">
+        ///     object of String which denotes deviceType </param>
+        /// <param name="deviceId">
+        ///     object of String which denotes deviceId</param>
+        public void subscribeToDeviceEvents(string deviceType, string deviceId)
+        {
+            subscribeToDeviceEvents(deviceType, deviceId, "+", "+", 0);
+        }
 
         public void subscribeToDeviceEvents(String deviceType, String deviceId, String evt)
         {
             subscribeToDeviceEvents(deviceType, deviceId, evt, "+", 0);
         } 
-        
-        public void subscribeToIMState(){
-        	subscribeToIMState("+");
-        }
 
-        public void subscribeToIMState(string deviceType){
-        	subscribeToIMState(deviceType,"+");
-        }
-        public void subscribeToIMState(string deviceType, string deviceId){
-        	subscribeToIMState(deviceType,deviceId,"+");
-        }
-        public void subscribeToIMState(string deviceType, string deviceId, string logicalInterfaceId ){
-        	subscribeToIMState(deviceType,deviceId,logicalInterfaceId,0);
-        }
-        public void subscribeToIMState(string deviceType, string deviceId, string logicalInterfaceId , byte qos){
-        	try
-        	{
-	            string newTopic = "iot-2/type/" + deviceType + "/id/" + deviceId + "/intf/" + logicalInterfaceId + "/evt/state";
-	            string[] topics = { newTopic };
-	            byte[] qosLevels = { qos };
-	            mqttClient.Subscribe(topics, qosLevels);
-	            mqttClient.MqttMsgPublishReceived -= client_MqttMsgArrived;
-	            mqttClient.MqttMsgPublishReceived += client_MqttMsgArrived;
-        	}
-        	catch(Exception e)
-        	{
-        		log.Error("Exception has occurred in IMState ",e);
-        		throw new Exception("Exception has occurred in IMState ",e);
-        	}
-        }
+        
         /// <summary>
         ///     Subscribe to device events of the IBM Internet of Things Foundation. <br>
         /// </summary>
@@ -346,7 +328,35 @@ namespace IBMWIoTP
         	}    
         }
         
+		public void subscribeToIMState(){
+		        	subscribeToIMState("+");
+		}
 
+        public void subscribeToIMState(string deviceType){
+        	subscribeToIMState(deviceType,"+");
+        }
+        public void subscribeToIMState(string deviceType, string deviceId){
+        	subscribeToIMState(deviceType,deviceId,"+");
+        }
+        public void subscribeToIMState(string deviceType, string deviceId, string logicalInterfaceId ){
+        	subscribeToIMState(deviceType,deviceId,logicalInterfaceId,0);
+        }
+        public void subscribeToIMState(string deviceType, string deviceId, string logicalInterfaceId , byte qos){
+        	try
+        	{
+	            string newTopic = "iot-2/type/" + deviceType + "/id/" + deviceId + "/intf/" + logicalInterfaceId + "/evt/state";
+	            string[] topics = { newTopic };
+	            byte[] qosLevels = { qos };
+	            mqttClient.Subscribe(topics, qosLevels);
+	            mqttClient.MqttMsgPublishReceived -= client_MqttMsgArrived;
+	            mqttClient.MqttMsgPublishReceived += client_MqttMsgArrived;
+        	}
+        	catch(Exception e)
+        	{
+        		log.Error("Exception has occurred in IMState ",e);
+        		throw new Exception("Exception has occurred in IMState ",e);
+        	}
+        }
         /// <summary>
         ///     Message subscription when subscribed event occurreds or subscribed command executes <br>
         /// </summary>
@@ -435,19 +445,7 @@ namespace IBMWIoTP
         	}
         }
   
-        /// <summary>
-        ///     Subscribe to device events of the IBM Internet of Things Foundation. <br>
-        ///     Quality of Service is set to 0 <br>
-        ///     All events, of a given device type and device id, are subscribed to.
-        /// </summary>
-        /// <param name="deviceType">
-        ///     object of String which denotes deviceType </param>
-        /// <param name="deviceId">
-        ///     object of String which denotes deviceId</param>
-        public void subscribeToDeviceEvents(string deviceType, string deviceId)
-        {
-            subscribeToDeviceEvents(deviceType, deviceId, "+", "+", 0);
-        }
+       
 
         /// <summary>
         ///     Publish command to the IBM Internet of Things Foundation. <br>
@@ -591,6 +589,76 @@ namespace IBMWIoTP
         		throw new Exception(" Api client can't be created for quickstart");
         	}
         	return new ApiClient(_apiKey , _authToken);
+        }
+        
+        public void unsubscribeToDeviceEvents(string deviceType, string deviceId, string evt, string format)
+        {
+        	try
+        	{
+	            String newTopic = "iot-2/type/" + deviceType + "/id/" + deviceId + "/evt/" + evt + "/fmt/" + format;
+	            string[] topics = { newTopic };
+	            mqttClient.Unsubscribe(topics);
+        	}
+        	catch(Exception e)
+        	{
+        		log.Error("Exception has occurred in unsubscribeToDeviceEvents ",e);
+        		throw new Exception("Exception has occurred in unsubscribeToDeviceEvents ",e);
+        	}
+        }
+        public void unsubscribeToDeviceStatus(string deviceType, string deviceId)
+        {
+        	try
+        	{
+	            String newTopic = "iot-2/type/" + deviceType + "/id/" + deviceId + "/mon";
+	            string[] topics = { newTopic };
+	            mqttClient.Unsubscribe(topics);
+             }
+        	catch(Exception e)
+        	{
+        		log.Error("Exception has occurred in unsubscribeToDeviceStatus ",e);
+        		throw new Exception("Exception has occurred in unsubscribeToDeviceStatus ",e);
+        	}
+        }
+        public void unsubscribeToApplicationStatus(string appId)
+        {
+        	try
+        	{
+	            String newTopic = "iot-2/app/" + appId + "/mon";
+	            string[] topics = { newTopic };
+	            mqttClient.Unsubscribe(topics);
+        	}
+        	catch(Exception e)
+        	{
+        		log.Error("Exception has occurred in unsubscribeToApplicationStatus ",e);
+        		throw new Exception("Exception has occurred in unsubscribeToApplicationStatus ",e);
+        	}
+        }
+        public void unsubscribeToDeviceCommands(string deviceType, string deviceId, string cmd, string format)
+        {
+        	try
+        	{
+	            String newTopic = "iot-2/type/" + deviceType + "/id/" + deviceId + "/cmd/" + cmd + "/fmt/" + format;
+	            string[] topics = { newTopic };
+	            mqttClient.Unsubscribe(topics);
+	        }
+        	catch(Exception e)
+        	{
+        		log.Error("Exception has occurred in unsubscribeToDeviceEvents ",e);
+        		throw new Exception("Exception has occurred in unsubscribeToDeviceEvents ",e);
+        	}    
+        }
+        public void unsubscribeToIMState(string deviceType, string deviceId, string logicalInterfaceId ){
+        	try
+        	{
+	            string newTopic = "iot-2/type/" + deviceType + "/id/" + deviceId + "/intf/" + logicalInterfaceId + "/evt/state";
+	            string[] topics = { newTopic };
+	            mqttClient.Unsubscribe(topics);
+        	}
+        	catch(Exception e)
+        	{
+        		log.Error("Exception has occurred in unsubscribeToIMState ",e);
+        		throw new Exception("Exception has occurred in unsubscribeToIMState ",e);
+        	}
         }
 
     }

@@ -93,8 +93,6 @@ Device-Type = <Your device Type>
 Device-ID = <Your device ID>
 Authentication-Method = token
 Authentication-Token = <Your device Token>
-CA-Certificate-Path = <Your root CA certificate path >
-CA-Certificate-Password = <Your root CA certificate password>
 Client-Certificate-Path =  <Your Client CA certificate path >
 Client-Certificate-Password = <Your Client CA certificate password >
 ```
@@ -114,8 +112,6 @@ Device-Type = <Your Gateway Type>
 Device-ID = <Your Gateway ID>
 Authentication-Method = token
 Authentication-Token = <Your Gateway Token>
-CA-Certificate-Path = <Your root CA certificate path >
-CA-Certificate-Password = <Your root CA certificate password>
 Client-Certificate-Path =  <Your Client CA certificate path >
 Client-Certificate-Password = <Your Client CA certificate password >
 ```

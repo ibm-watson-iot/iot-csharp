@@ -59,7 +59,7 @@ namespace IBMWIoTP
                             string caCertificatePath, string caCertificatePassword, string clientCertificatePath, 
                             string clientCertificatePassword)
             : base(orgId, "d" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + deviceType + CLIENT_ID_DELIMITER + deviceID, 
-        	       "use-token-auth", authtoken,  caCertificatePath,  caCertificatePassword,  clientCertificatePath,
+        	       "use-token-auth", authtoken,   clientCertificatePath,
 					clientCertificatePassword)
         {
 
@@ -76,7 +76,7 @@ namespace IBMWIoTP
         public DeviceClient(string filePath) :
         	base(parseFromFile(filePath),
         	     "d" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID,
-        	     "use-token-auth", _authtoken, _caCertificatePath, _caCertificatePassword,
+        	     "use-token-auth", _authtoken, 
         	     _clientCertificatePath, _clientCertificatePassword)
         	
         {
@@ -251,6 +251,23 @@ namespace IBMWIoTP
         public delegate void processCommand(string cmdName, string format, string data);
 
         public event processCommand commandCallback;
+        
+        public void unsubscribeCommand(string cmd, string format)
+        {
+        	try{
+	        	string topic = "iot-2/cmd/" + cmd + "/fmt/" + format;
+	            string[] topics = { topic };
+	            mqttClient.Unsubscribe(topics);
+	
+	            log.Info("unSubscribes to topic to topic [" + topic + "]");
+        	}
+        	catch(Exception e)
+        	{
+        		log.Error("Exception has occurred in unsubscribeCommand ",e);
+        		throw new Exception("Exception has occurred in unsubscribeCommand ",e);
+        	}
+            
+        }
     
     }
 }

@@ -82,7 +82,7 @@ namespace IBMWIoTP
 		                     string clientCertificatePassword)
             : base(orgId,
 			       "g" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + gatewayDeviceType + CLIENT_ID_DELIMITER + gatewayDeviceID, 
-			       "use-token-auth", authToken, caCertificatePath,  caCertificatePassword,
+			       "use-token-auth", authToken, 
 			       clientCertificatePath,  clientCertificatePassword)
 		{
 			this.gatewayDeviceID =gatewayDeviceID;
@@ -101,7 +101,7 @@ namespace IBMWIoTP
 		public GatewayClient(string filePath)
             : base(parseFromFile( filePath), 
 			       "g" + CLIENT_ID_DELIMITER + _orgId + CLIENT_ID_DELIMITER + _deviceType + CLIENT_ID_DELIMITER + _deviceID,
-			       "use-token-auth", _authtoken, _caCertificatePath, _caCertificatePassword,
+			       "use-token-auth", _authtoken, 
 			       _clientCertificatePath, _clientCertificatePassword)
 		{
 			this.gatewayDeviceID =_deviceID;
@@ -325,6 +325,18 @@ namespace IBMWIoTP
         		throw new Exception("Exception has occurred in client_MqttMsgPublishReceived ",ex);
         	}
         }
+        public void unsubscribeToDeviceCommands(string deviceType, string deviceId, string command) {
+			try {
+				mqttClient.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
+				string newTopic = "iot-2/type/"+deviceType+"/id/"+deviceId+"/cmd/" + command + "/fmt/json";
+				string[] topics = { newTopic };
+		        mqttClient.Unsubscribe(topics);
+		        
+			} catch (Exception e) {
+                log.Error("Exception has occurred in unsubscribeToDeviceCommands",e);
+                throw new Exception("Exception has occurred in unsubscribeToDeviceCommands",e);
+			}
+		}
 
 	}
 }
