@@ -91,17 +91,12 @@ namespace IBMWIoTP
         ///     object of String which denotes userName </param>
         /// <param name="password">
         ///     object of String which denotes password </param>
-        ///	<param name="caCertificatePath">
-        ///     object of String which denotes CA certificate path </param>
-        /// <param name="caCertificatePassword">
-        ///     object of String which denotes CA certificate password </param>
         /// <param name="clientCertificatePath">
         ///     object of String which denotes client certificate path </param>
         /// <param name="clientCertificatePassword">
         ///     object of String which denotes client certificate password </param>
                 
         public AbstractClient(string orgid, string clientId, string userName,string password,
-                              string caCertificatePath, string caCertificatePassword,
                               string clientCertificatePath, string clientCertificatePassword)
         {
         	
@@ -111,8 +106,8 @@ namespace IBMWIoTP
             this.clientPassword = password;
             this.orgId = orgid;
             
-            this.caCertificatePath = caCertificatePath;
-            this.caCertificatePassword = caCertificatePassword;
+            //this.caCertificatePath = caCertificatePath;
+            //this.caCertificatePassword = caCertificatePassword;
             this.clientCertificatePath = clientCertificatePath;
             this.clientCertificatePassword = clientCertificatePassword;
 			init ();
@@ -123,13 +118,13 @@ namespace IBMWIoTP
 		private void init(){
 			String now = DateTime.Now.ToString(".yyyy.MM.dd-THH.mm.fff");
 			string hostName = orgId + DOMAIN;
-			if(String.IsNullOrEmpty(caCertificatePath)  || String.IsNullOrEmpty(clientCertificatePath) || String.IsNullOrEmpty(clientCertificatePassword)){ 		
+			if( String.IsNullOrEmpty(clientCertificatePath) || String.IsNullOrEmpty(clientCertificatePassword)){ 		
 
 				try {
 					X509Certificate cer = new X509Certificate();
-					if(File.Exists("message.pem")){
-						cer.Import("message.pem");
-					}
+//					if(File.Exists("message.pem")){
+//						cer.Import("message.pem");
+//					}
 					log.Info("hostname is :" + hostName);
 					mqttClient = new MqttClient(hostName,MQTTS_PORT,true,cer,new X509Certificate(),MqttSslProtocols.TLSv1_2);
 					mqttClient.ProtocolVersion = MqttProtocolVersion.Version_3_1;
@@ -150,13 +145,13 @@ namespace IBMWIoTP
 			}else{
 				try {
 
-					X509Certificate2 caCert = new X509Certificate2(caCertificatePath, caCertificatePassword);
+//					X509Certificate2 caCert = new X509Certificate2(caCertificatePath, caCertificatePassword);
 					X509Certificate2 clientCert = new X509Certificate2(clientCertificatePath, clientCertificatePassword);
 
 					try{
 						X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
 						store.Open(OpenFlags.ReadWrite);
-						store.Add(caCert); 
+//						store.Add(caCert); 
 						store.Add(clientCert);
 						store.Close();
 					}
@@ -167,7 +162,7 @@ namespace IBMWIoTP
 
 
 					log.Info("hostname is :" + hostName);
-					mqttClient = new MqttClient(hostName,MQTTS_PORT,true,caCert,clientCert,MqttSslProtocols.TLSv1_2);
+					mqttClient = new MqttClient(hostName,MQTTS_PORT,true, new X509Certificate(),clientCert,MqttSslProtocols.TLSv1_2);
 					mqttClient.ProtocolVersion = MqttProtocolVersion.Version_3_1;
 					mqttClient.ConnectionClosed += ConnectionClosed;
 

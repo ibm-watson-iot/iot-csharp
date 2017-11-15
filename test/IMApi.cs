@@ -450,7 +450,7 @@ namespace test
 			client.SetResponse(HttpStatusCode.OK,json);
 			SchemaDraft sd = new SchemaDraft();
 			sd.name ="tempEventSchema";
-			sd.schemaFile="tempSchemaPi.json";
+			sd.schemaFile="../../Resource/tempSchemaPi.json";
 			draftSchemaForPhysicalInterface = client.AddDraftSchema(sd);
 			Assert.IsNotNull(draftSchemaForPhysicalInterface);
 			Assert.AreEqual("58258b8146e0fb0001458b7c",draftSchemaForPhysicalInterface.id);

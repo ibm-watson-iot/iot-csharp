@@ -48,7 +48,7 @@ namespace test
 	public class DeviceClient 
 	{
 		IBMWIoTP.DeviceClient testClient;
-		string orgId,deviceType,deviceID,authmethod,authtoken,caCertificatePath,caCertificatePassword,clientCertificatePath,clientCertificatePassword;
+		string orgId,deviceType,deviceID,authmethod,authtoken,clientCertificatePath,clientCertificatePassword;//caCertificatePath,caCertificatePassword,
 		
 		[SetUp]
 		public void Setup() 
@@ -91,8 +91,8 @@ namespace test
 	    		!data.TryGetValue("Device-ID",out deviceID)||
 	    		!data.TryGetValue("Authentication-Method",out authmethod)||
 	    		!data.TryGetValue("Authentication-Token",out authtoken) ||
-	    		!data.TryGetValue("CA-Certificate-Path",out caCertificatePath)||
-				!data.TryGetValue("CA-Certificate-Password",out caCertificatePassword)||
+//	    		!data.TryGetValue("CA-Certificate-Path",out caCertificatePath)||
+//				!data.TryGetValue("CA-Certificate-Password",out caCertificatePassword)||
 				!data.TryGetValue("Client-Certificate-Path",out clientCertificatePath)||
 				!data.TryGetValue("Client-Certificate-Password",out clientCertificatePassword))
         	{
@@ -150,6 +150,11 @@ namespace test
 			Assert.AreEqual(fmt,"json");
 			Assert.AreEqual(data,"name:foo,cpu:60,mem:50");
 			Assert.IsTrue(wasCalled);
+		}
+		[Test]
+		public void DeviceClientCommandUnSubscription()
+		{
+			testClient.unsubscribeCommand("testcmd", "json");
 		}
 		[Test]
 		public void DeviceClientSendEvent()

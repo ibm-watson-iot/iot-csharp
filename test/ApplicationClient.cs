@@ -83,6 +83,33 @@ namespace test
 			testApp.subscribeToDeviceEvents("demotest", "12345678", "test", "josn", 0);
 		}
 		[Test]
+		public void ApplicationClientDeviceCommandSubscription()
+		{
+			testApp.subscribeToDeviceCommands("demotest", "12345678", "test", "josn", 0);
+		}
+		
+		[Test]
+		public void ApplicationClientDeviceStatusUnSubscription()
+		{
+			testApp.unsubscribeToDeviceStatus("demotest","12345678");
+		}
+		[Test]
+		public void ApplicationClientApplicationStatusUnSubscription()
+		{
+			testApp.unsubscribeToApplicationStatus("+");
+		}
+		[Test]
+		public void ApplicationClientDeviceEventUnSubscription()
+		{
+			testApp.unsubscribeToDeviceEvents("demotest", "12345678", "test", "josn");
+		}
+		[Test]
+		public void ApplicationClientDeviceCommandUnSubscription()
+		{
+			testApp.unsubscribeToDeviceCommands("demotest", "12345678", "test", "josn");
+		}
+		
+		[Test]
 		public void ApplicationClientPublishCommand()
 		{
 			bool result = testApp.publishCommand("demotest", "12345678", "test", "josn","{\"temp\":25}" ,0);
@@ -92,11 +119,7 @@ namespace test
 			}
 			Assert.IsTrue(result);
 		}
-		[Test]
-		public void ApplicationClientDeviceCommandSubscription()
-		{
-			testApp.subscribeToDeviceCommands("demotest", "12345678", "test", "josn", 0);
-		}
+
 		[Test]
 		public void ApplicationClientPublishEvent()
 		{
@@ -139,6 +162,11 @@ namespace test
 			Assert.AreEqual("59a6c41052faff002c332a3b",LIId);
 			Assert.AreEqual(msg,json);
 			
+		}
+		[Test]
+		public void ApplicationClientUnSubscribeToIMState()
+		{
+			testApp.unsubscribeToIMState("demotest","1qaz2wsx","59a6c41052faff002c332a3b");
 		}
 	}
 }
