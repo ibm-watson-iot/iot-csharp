@@ -41,9 +41,9 @@ namespace IBMWIoTP
         private string clientId;
         private string orgId;
         
-        private string caCertificatePath;
+//        private string caCertificatePath;
         private string clientCertificatePath;
-        private string caCertificatePassword;
+//        private string caCertificatePassword;
         private string clientCertificatePassword;
         private bool _isSecureConnection;
         private bool isCleanSesson = false;

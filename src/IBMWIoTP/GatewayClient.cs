@@ -52,8 +52,8 @@ namespace IBMWIoTP
         static string _authmethod ="";
         static string _authtoken ="";
         
-        static string _caCertificatePath = "";
-        static string _caCertificatePassword = "";
+//        static string _caCertificatePath = "";
+//        static string _caCertificatePassword = "";
         static string _clientCertificatePath = "";
         static string _clientCertificatePassword = "";
         
@@ -78,8 +78,7 @@ namespace IBMWIoTP
 		
 		
 		public GatewayClient(string orgId, string gatewayDeviceType, string gatewayDeviceID, string authMethod, string authToken,
-		                     string caCertificatePath, string caCertificatePassword, string clientCertificatePath, 
-		                     string clientCertificatePassword)
+		                      string clientCertificatePath, string clientCertificatePassword)
             : base(orgId,
 			       "g" + CLIENT_ID_DELIMITER + orgId + CLIENT_ID_DELIMITER + gatewayDeviceType + CLIENT_ID_DELIMITER + gatewayDeviceID, 
 			       "use-token-auth", authToken, 
@@ -121,11 +120,11 @@ namespace IBMWIoTP
         	}
         	try{
         		bool isAuth = data.TryGetValue("Authentication-Token",out _authtoken);
-        		bool isCaCert = data.TryGetValue("CA-Certificate-Path",out _caCertificatePath);
-        		data.TryGetValue("CA-Certificate-Password",out _caCertificatePassword);
+//        		bool isCaCert = data.TryGetValue("CA-Certificate-Path",out _caCertificatePath);
+//        		data.TryGetValue("CA-Certificate-Password",out _caCertificatePassword);
 				bool isClientCert = data.TryGetValue("Client-Certificate-Path",out _clientCertificatePath);
 				data.TryGetValue("Client-Certificate-Password",out _clientCertificatePassword);
-				if(!isAuth && !(isCaCert && isClientCert)){
+				if(!isAuth && !isClientCert){
 					throw new Exception ("No Authentication provided");
 				}
         		}

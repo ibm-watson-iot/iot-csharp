@@ -20,7 +20,7 @@ namespace test
 	public class GatewayClient
 	{
 		IBMWIoTP.GatewayClient testClient;
-		string orgId,deviceType,deviceID,authmethod,authtoken,caCertificatePath,caCertificatePassword,clientCertificatePath,clientCertificatePassword;
+		string orgId,deviceType,deviceID,authmethod,authtoken,clientCertificatePath,clientCertificatePassword;//,caCertificatePath,caCertificatePassword
 		
 		[SetUp]
 		public void Setup() 
@@ -63,7 +63,7 @@ namespace test
         	{
         		throw new Exception("Invalid property file");
         	}
-			 testClient  = new IBMWIoTP.GatewayClient(orgId,deviceType,deviceID,authmethod,authtoken,caCertificatePath,caCertificatePassword,clientCertificatePath,clientCertificatePassword);
+			 testClient  = new IBMWIoTP.GatewayClient(orgId,deviceType,deviceID,authmethod,authtoken,clientCertificatePath,clientCertificatePassword);
 		}
 		[Test, ExpectedException]
 		public void GatewayClientObjectCreationWithinvalidFilePath()
