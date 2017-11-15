@@ -98,7 +98,7 @@ namespace test
         	{
         		throw new Exception("Invalid property file");
         	}
-			 testClient  = new IBMWIoTP.DeviceClient(orgId,deviceType,deviceID,authmethod,authtoken,caCertificatePath,caCertificatePassword,clientCertificatePath,clientCertificatePassword);
+			 testClient  = new IBMWIoTP.DeviceClient(orgId,deviceType,deviceID,authmethod,authtoken,clientCertificatePath,clientCertificatePassword);
 		}
 		[Test]
 		public void DeviceClientObjectCreationWithFilePath()
